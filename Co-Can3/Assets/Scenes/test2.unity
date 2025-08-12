@@ -1241,9 +1241,41 @@ PrefabInstance:
       propertyPath: texts.Array.data[2]
       value: ninzinn
       objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 9152093399723393124}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetCmdAct
+      objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: CmdTest, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 746638617724114681, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1152708658413033338, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
       propertyPath: m_Name
       value: tyouri2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2556601621549206143, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
+      propertyPath: m_Camera
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3182030749799640357, guid: 668b2ad43c61f4e468b0247e57fdc8a3, type: 3}
       propertyPath: texts.Array.data[0]
@@ -1594,6 +1626,7 @@ GameObject:
   - component: {fileID: 9152093399723393123}
   - component: {fileID: 4821230297918439607}
   - component: {fileID: 7382595452534713882}
+  - component: {fileID: 9152093399723393124}
   m_Layer: 0
   m_Name: char
   m_TagString: Untagged
@@ -1672,6 +1705,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9152093399723393124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5275864830564829091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2751bf812c262d4cbb7c7aebf56c9c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterAnimator: {fileID: 7382595452534713882}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
