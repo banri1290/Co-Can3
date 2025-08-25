@@ -10,22 +10,14 @@ public class SlotController : MonoBehaviour
     // 次のテキストへ
     public void NextItem()
     {
-        currentIndex++;
-        if (currentIndex >= texts.Length)
-        {
-            currentIndex = 0; // 最初に戻る
-        }
+        currentIndex=(currentIndex + 1) % texts.Length; // 次のインデックスへ、最後は最初に戻る
         UpdateText();
     }
 
     // 前のテキストへ
     public void PreviousItem()
     {
-        currentIndex--;
-        if (currentIndex < 0)
-        {
-            currentIndex = texts.Length - 1; // 最後に戻る
-        }
+        currentIndex= (currentIndex - 1 + texts.Length) % texts.Length; // 前のインデックスへ、最初は最後に戻る
         UpdateText();
     }
 
