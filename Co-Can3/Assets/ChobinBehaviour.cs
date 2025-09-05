@@ -1,9 +1,20 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class ChobinBehaviour : MonoBehaviour
 {
+    public enum CookingStage
+    {
+        None,
+        Washed,
+        Cut,
+        Baked,
+        Served,
+        Dish
+    }
+
     public enum Status
     {
         CommandWaitiating = 0,
@@ -14,6 +25,14 @@ public class ChobinBehaviour : MonoBehaviour
     [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private float performingTimeLength = 2f;
 
+    // 新增：不同场所对应的物体
+    [SerializeField] private GameObject washedObject;
+    [SerializeField] private GameObject cutObject;
+    [SerializeField] private GameObject bakedObject;
+    [SerializeField] private GameObject servedObject; 
+    [SerializeField] private GameObject dishObject;
+
+
     private Transform[] target;
     private int[] MaterialIndex;
     private int[] ActionIndex;
@@ -21,18 +40,19 @@ public class ChobinBehaviour : MonoBehaviour
     Status status;
     private float performingTime;
 
+    private CookingStage currentStage = CookingStage.None;
+
     public int[] materialIndex => MaterialIndex;
     public int[] actionIndex => ActionIndex;
 
-    // Start is called before the first frame update
     void Start()
     {
         currentIndex = 0;
         status = Status.CommandWaitiating;
         performingTime = 0f;
+        HideAllStageObjects(); // 初始化时隐藏所有物体
     }
 
-    // Update is called once per frame
     void Update()
     {
         switch (status)
@@ -114,5 +134,54 @@ public class ChobinBehaviour : MonoBehaviour
     public void SetPerformingTimeLength(float time)
     {
         performingTimeLength = time;
+    }
+
+    // 新增：隐藏所有场所物体
+    void HideAllStageObjects()
+    {
+        if (washedObject != null) washedObject.SetActive(false);
+        if (cutObject != null) cutObject.SetActive(false);
+        if (bakedObject != null) bakedObject.SetActive(false);
+        if (servedObject != null) servedObject.SetActive(false);
+        if (dishObject != null) dishObject.SetActive(false);
+    }
+
+    // 只保留冲突判定部分，并显示不同物体
+    void OnTriggerEnter(Collider other)
+    {
+        HideAllStageObjects(); // 每次进入新场所先隐藏所有物体
+
+        if (other.CompareTag("WashStation"))
+        {
+            currentStage = CookingStage.Washed;
+            if (washedObject != null) washedObject.SetActive(true);
+        }
+        else if (other.CompareTag("CutStation"))
+        {
+            if (currentStage == CookingStage.Washed || currentStage == CookingStage.None)
+            {
+                currentStage = CookingStage.Cut;
+                if (cutObject != null) cutObject.SetActive(true);
+            }
+        }
+        else if (other.CompareTag("BakeStation"))
+        {
+            if (currentStage == CookingStage.Cut || currentStage == CookingStage.None)
+            {
+                currentStage = CookingStage.Baked;
+                if (bakedObject != null) bakedObject.SetActive(true);
+            }
+        }
+        else if (other.CompareTag("ServeStation"))
+        {
+            currentStage = CookingStage.Served;
+            if (servedObject != null) servedObject.SetActive(true);
+        }
+        else if (other.CompareTag("DishStation"))
+        {
+            currentStage = CookingStage.Dish;
+            if (dishObject != null) dishObject.SetActive(true);
+        }
+
     }
 }
