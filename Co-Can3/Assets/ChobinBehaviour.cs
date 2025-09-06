@@ -24,8 +24,8 @@ public class ChobinBehaviour : MonoBehaviour
 
     [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private float performingTimeLength = 2f;
+    [SerializeField] private float[] actionIntervalTimes;
 
-    // 新增：不同场所对应的物体
     [SerializeField] private GameObject washedObject;
     [SerializeField] private GameObject cutObject;
     [SerializeField] private GameObject bakedObject;
@@ -40,6 +40,9 @@ public class ChobinBehaviour : MonoBehaviour
     Status status;
     private float performingTime;
 
+    private float actionIntervalTimer = 0f;
+    private bool isIntervalWaiting = false;
+
     private CookingStage currentStage = CookingStage.None;
 
     public int[] materialIndex => MaterialIndex;
@@ -50,11 +53,25 @@ public class ChobinBehaviour : MonoBehaviour
         currentIndex = 0;
         status = Status.CommandWaitiating;
         performingTime = 0f;
-        HideAllStageObjects(); // 初始化时隐藏所有物体
+        HideAllStageObjects(); 
     }
 
     void Update()
     {
+        if (isIntervalWaiting)
+        {
+            actionIntervalTimer += Time.deltaTime;
+            float interval = (actionIntervalTimes != null && currentIndex < actionIntervalTimes.Length) ? actionIntervalTimes[currentIndex] : 0f;
+            if (actionIntervalTimer >= interval)
+            {
+                isIntervalWaiting = false;
+                actionIntervalTimer = 0f;
+                status = Status.Moving;
+                navAgent.SetDestination(target[currentIndex].position);
+            }
+            return;
+        }
+
         switch (status)
         {
             case Status.CommandWaitiating:
@@ -86,9 +103,10 @@ public class ChobinBehaviour : MonoBehaviour
             performingTime = 0f;
             if (currentIndex < actionIndex.Length - 1)
             {
-                status = Status.Moving;
+                // 进入间隔等待状态
+                isIntervalWaiting = true;
+                actionIntervalTimer = 0f;
                 currentIndex++;
-                navAgent.SetDestination(target[currentIndex].position);
             }
             else
             {
@@ -102,12 +120,20 @@ public class ChobinBehaviour : MonoBehaviour
         target = new Transform[count];
         MaterialIndex = new int[count];
         ActionIndex = new int[count];
+        actionIntervalTimes = new float[count]; 
         for (int i = 0; i < count; i++)
         {
             target[i] = null;
             MaterialIndex[i] = 0;
             ActionIndex[i] = 0;
+            actionIntervalTimes[i] = 1f; 
         }
+    }
+
+    public void SetActionIntervalTime(int index, float interval)
+    {
+        if (actionIntervalTimes != null && index < actionIntervalTimes.Length)
+            actionIntervalTimes[index] = interval;
     }
 
     public void SetMaterial(int index, int material)
@@ -136,7 +162,6 @@ public class ChobinBehaviour : MonoBehaviour
         performingTimeLength = time;
     }
 
-    // 新增：隐藏所有场所物体
     void HideAllStageObjects()
     {
         if (washedObject != null) washedObject.SetActive(false);
@@ -146,10 +171,9 @@ public class ChobinBehaviour : MonoBehaviour
         if (dishObject != null) dishObject.SetActive(false);
     }
 
-    // 只保留冲突判定部分，并显示不同物体
     void OnTriggerEnter(Collider other)
     {
-        HideAllStageObjects(); // 每次进入新场所先隐藏所有物体
+        HideAllStageObjects(); 
 
         if (other.CompareTag("WashStation"))
         {
