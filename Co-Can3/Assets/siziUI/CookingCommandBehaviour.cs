@@ -28,12 +28,37 @@ public class CookingCommandBehaviour : MonoBehaviour
         public Transform KitchinSpot => kitchinSpot; //調理場の位置を取得
     }
 
+    enum SpriteSizeOption
+    {
+        NonKeepAspect, // アスペクト比を維持しない
+        KeepAspectWithCurrentWidth, // 現在の幅を維持してアスペクト比を調整
+        KeepAspectWithCurrentHeight, // 現在の高さを維持してアスペクト比を調整
+    }
+
     [Header("チョビンの設定")]
     [SerializeField] private ChobinBehaviour[] chobins;
+    [SerializeField] private Transform WaitingSpot; // 待機場所
+    [SerializeField] private float chobinSpeed; // チョビンの移動速度
+    [SerializeField] private float chobinAcceleration; // チョビンの加速度
     [SerializeField] private float performingTimeLength = 2f; // 調理にかかる時間
-    [Header("ここに食材・調理法を選択するUIグループをD&D")]
+    [SerializeField] private float waitingSpotRadius = 1f; // 待機場所の半径
+    [Header("チョビンを選択するボタンと表示するCanvasをD&D")]
+    [SerializeField] private GameObject chobinButtonCanvas; // チョビンのUIを表示するCanvas
+    [SerializeField] private GameObject chobinButtonPrefab; // チョビンのUIプレハブ
+    [SerializeField] private Sprite chobinButtonSprite; // チョビンのUIのスプライト
+    [SerializeField] private string chobinButtonPrefabName = "ChobinButton"; // チョビンのUIの名前
+    [SerializeField] private Vector3 chobinButtonOffset; // チョビンのUIの位置
+    [SerializeField] private Vector2 chobinButtonSize; // チョビンのUIのサイズ
+    [SerializeField] private SpriteSizeOption chobinButtonSizeOption = SpriteSizeOption.NonKeepAspect; // チョビンのUIのサイズオプション
+    [SerializeField] private bool chobinButtonCanvasStartActive = true; // ゲーム開始時にチョビン選択ボタンを表示するか
+
+    [Header("ここに食材・調理法を選択するUIをD&D")]
     [SerializeField] private GameObject commandUIPrefab; // UIプレハブを登録
+    [SerializeField] private GameObject commandCanvas; // Canvasオブジェクトを登録
     [SerializeField] private GameObject commandUIParent; // UIの親オブジェクトを登録
+    [SerializeField] private string materialUIPrefabName = "MaterialUI"; // 食材UIの名前
+    [SerializeField] private string actionUIPrefabName = "ActionUI"; // 調理法UIの名前
+    [SerializeField] private bool commandCanvasStartActive = false; // ゲーム開始時にコマンドUIを表示するか
     [Header("食材・調理法の名前リスト")]
     [SerializeField] private Material[] MaterialList; // 食材のリスト
     [SerializeField] private Action[] ActionList;
@@ -54,6 +79,7 @@ public class CookingCommandBehaviour : MonoBehaviour
     [SerializeField] private Sprite leftButtonSprite;  // 左ボタンのスプライト
     [SerializeField] private Sprite rightButtonSprite; // 右ボタンのスプライト
     [SerializeField] private Vector2 ButtonSize = new Vector2(100, 100); // ボタンサイズ
+    [SerializeField] private SpriteSizeOption buttonSizeOption = SpriteSizeOption.NonKeepAspect; // ボタンサイズオプション
 
     // UI要素の参照
     private RectTransform[] materialUIRects;
@@ -64,7 +90,6 @@ public class CookingCommandBehaviour : MonoBehaviour
     private TextMeshProUGUI[] actionUITexts;
     private Button[] actionLeftButtons;
     private Button[] actionRightButtons;
-    private int currentCommandCount;
 
     private int currentChobinUIIndex;
 
@@ -72,12 +97,8 @@ public class CookingCommandBehaviour : MonoBehaviour
     void Start()
     {
         currentChobinUIIndex = 0;
-        InitUIParent();
-        for (int i = 0; i < commandCount; i++)
-        {
-            SetMaterial(i, 0); // 初期化時に食材を設定
-            SetAction(i, 0); // 初期化時に調理法を設定
-        }
+        ChackSettings();
+        if (commandCanvasStartActive) ShowCommand(currentChobinUIIndex);
     }
 
     // 毎フレームの更新処理（未使用）
@@ -87,10 +108,12 @@ public class CookingCommandBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// UI要素の初期化と配置、ボタンイベントの設定
+    /// 設定の確認とUIの初期化
     /// </summary>
-    private void Init()
+    private void ChackSettings()
     {
+        bool commandUIisCorrect = true;
+
         // UIの数を調整
         if (commandCount < 1)
         {
@@ -108,8 +131,6 @@ public class CookingCommandBehaviour : MonoBehaviour
             Debug.LogWarning("右ボタンの位置が左側に設定されています。右ボタンは右側に配置してください。");
         }
 
-        bool commandUIisCorrect = true;
-
         if (chobins.Length > 0)
         {
             for (int i = 0; i < chobins.Length; i++)
@@ -124,11 +145,6 @@ public class CookingCommandBehaviour : MonoBehaviour
                     commandUIisCorrect = false;
                     Debug.LogError($"ChobinBehaviourのNavMeshAgentがChobin {i} に設定されていません。NavMeshAgentを追加してください。");
                 }
-                else
-                {
-                    chobins[i].InitIndex(commandCount); // 各Chobinのインデックスを初期化
-                    chobins[i].SetPerformingTimeLength(performingTimeLength); // 調理時間を設定
-                }
             }
         }
         else
@@ -136,8 +152,69 @@ public class CookingCommandBehaviour : MonoBehaviour
             commandUIisCorrect = false;
             Debug.LogError("ChobinBehaviourの配列が空です。ChobinBehaviourをアタッチしてください。");
         }
+
+        if (WaitingSpot == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("待機場所のTransformが設定されていません。");
+        }
+
+        if (chobinButtonCanvas == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("チョビン選択用のCanvasオブジェクトが設定されていません。");
+        }
+        if (chobinButtonPrefab == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("チョビン選択用のボタンプレハブが設定されていません。");
+        }
+        else if (chobinButtonPrefab.GetComponent<Button>() == null || chobinButtonPrefab.GetComponent<Image>() == null || chobinButtonPrefab.GetComponent<RectTransform>() == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("チョビン選択用のボタンプレハブのコンポーネントが正しく設定されていません。");
+        }
+
+        if (MaterialList.Length == 0)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("食材リストが空です。少なくとも1つの食材を追加してください。");
+        }
+        if (ActionList.Length == 0)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("調理法リストが空です。少なくとも1つの調理法を追加してください。");
+        }
+        else
+        {
+            for (int i = 0; i < ActionList.Length; i++)
+            {
+                if (ActionList[i].KitchinSpot == null)
+                {
+                    commandUIisCorrect = false;
+                    Debug.LogError($"調理法 {ActionList[i].Name} に調理場のTransformが設定されていません。");
+                }
+            }
+        }
+
+        if (commandCanvas == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("指示UIを表示するCanvasオブジェクトが設定されていません。");
+        }
+        else
+        {
+            commandCanvas.SetActive(commandCanvasStartActive);
+        }
+
+        if (commandUIParent == null)
+        {
+            commandUIisCorrect = false;
+            Debug.LogError("コマンドUIの親オブジェクトが設定されていません。");
+        }
+
         // 食材・調理法オブジェクトがnullでないか確認
-        if (commandUIPrefab != null && commandUIParent != null)
+        if (commandUIPrefab != null)
         {
             bool hasText = false;
             bool hasLeftButton = false;
@@ -189,33 +266,52 @@ public class CookingCommandBehaviour : MonoBehaviour
         else
         {
             commandUIisCorrect = false;
-            if (commandUIPrefab == null)
-            {
-                Debug.LogError("コマンドUIプレハブが設定されていません。");
-            }
-            if (commandUIParent == null)
-            {
-                Debug.LogError("コマンドUIの親オブジェクトが設定されていません。");
-            }
+            Debug.LogError("コマンドUIプレハブが設定されていません。");
         }
         // 全てのコマンドが正しくセットアップされている場合のみUIを初期化
         if (commandUIisCorrect)
         {
+            Init();
+        }
+    }
 
-#if UNITY_EDITOR
-            if (currentCommandCount != commandCount)
+    /// <summary>
+    /// 初期化
+    /// </summary>
+    private void Init()
+    {
+        if (EditorApplication.isPlaying)
+        {
+            InitUIParent();
+            InitChobinButtonParent();
+        }
+        else
+        {
+            bool changeCommandCount = (commandUIParent.transform.childCount != commandCount * 2);
+            bool changeMaterialUIName = (commandUIParent.transform.GetChild(0).name != materialUIPrefabName + "_0");
+            bool changeActionUIName = (commandUIParent.transform.GetChild(1).name != actionUIPrefabName + "_0");
+            if (changeCommandCount || changeMaterialUIName || changeActionUIName)
             {
-                currentCommandCount = commandCount;
+                Debug.Log("コマンド数が変更されたため、UIを再初期化します。");
                 EditorApplication.delayCall += InitUIParent; // UIの親オブジェクトを初期化
             }
             else
             {
-                InitUI();
+                InitUI(); // UIのスタイルを更新
             }
-#endif
-
-            Debug.Log("CookingCommandBehaviourの初期化が正常に完了しました。");
+            bool changeChobinCount = (chobinButtonCanvas.transform.childCount != chobins.Length);
+            if (changeChobinCount)
+            {
+                Debug.Log("チョビンの数が変更されたため、チョビン選択ボタンを再初期化します。");
+                EditorApplication.delayCall += InitChobinButtonParent; // チョビン選択ボタンの親オブジェクトを初期化
+            }
+            else
+            {
+                InitChobins(); // チョビンのパラメータを更新
+            }
         }
+
+        Debug.Log("CookingCommandBehaviourの初期化が正常に完了しました。");
     }
 
     private void InitUIParent()
@@ -228,6 +324,7 @@ public class CookingCommandBehaviour : MonoBehaviour
         actionUITexts = new TextMeshProUGUI[commandCount];
         actionLeftButtons = new Button[commandCount];
         actionRightButtons = new Button[commandCount];
+
         // 既存のUIオブジェクトを削除
         while (commandUIParent.transform.childCount > 0)
         {
@@ -245,18 +342,16 @@ public class CookingCommandBehaviour : MonoBehaviour
             materialUIObject = Instantiate(commandUIPrefab, commandUIParent.transform);
             actionUIObject = Instantiate(commandUIPrefab, commandUIParent.transform);
 #endif
-            PrefabUtility.UnpackPrefabInstance(materialUIObject, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
-            PrefabUtility.UnpackPrefabInstance(actionUIObject, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
-            materialUIObject.name = "MaterialUI_" + i; // 食材UIの名前を設定
-            actionUIObject.name = "ActionUI_" + i; // 調理法UIの名前を設定
+            materialUIObject.name = materialUIPrefabName + "_" + i; // 食材UIの名前を設定
+            actionUIObject.name = actionUIPrefabName + "_" + i; // 調理法UIの名前を設定
+
             // UIの位置を設定
             materialUIRects[i] = materialUIObject.GetComponent<RectTransform>();
             actionUIRects[i] = actionUIObject.GetComponent<RectTransform>();
 
             foreach (Transform t in materialUIObject.transform)
             {
-                RectTransform rectTransform = t.GetComponent<RectTransform>();
-                if (rectTransform != null)
+                if (t.TryGetComponent<RectTransform>(out var rectTransform))
                 {
                     if (t.GetComponent<TextMeshProUGUI>() != null)
                     {
@@ -267,7 +362,6 @@ public class CookingCommandBehaviour : MonoBehaviour
                         if (rectTransform.anchoredPosition.x < 0)
                         {
                             materialLeftButtons[i] = t.GetComponent<Button>();
-
                         }
                         else
                         {
@@ -278,8 +372,7 @@ public class CookingCommandBehaviour : MonoBehaviour
             }
             foreach (Transform t in actionUIObject.transform)
             {
-                RectTransform rectTransform = t.GetComponent<RectTransform>();
-                if (rectTransform != null)
+                if (t.TryGetComponent<RectTransform>(out var rectTransform))
                 {
                     if (t.GetComponent<TextMeshProUGUI>() != null)
                     {
@@ -290,7 +383,6 @@ public class CookingCommandBehaviour : MonoBehaviour
                         if (rectTransform.anchoredPosition.x < 0)
                         {
                             actionLeftButtons[i] = t.GetComponent<Button>();
-
                         }
                         else
                         {
@@ -300,8 +392,8 @@ public class CookingCommandBehaviour : MonoBehaviour
                 }
             }
         }
-
         InitUI();
+
 #if UNITY_EDITOR
         EditorApplication.delayCall -= InitUIParent; // 一度だけ実行するために解除
 #endif
@@ -309,7 +401,27 @@ public class CookingCommandBehaviour : MonoBehaviour
 
     private void InitUI()
     {
-        for (int i = 0; i < commandCount; i++)
+        //ボタンのサイズオプションに応じてサイズを調整
+        ButtonSize = SpriteSize(leftButtonSprite, ButtonSize, buttonSizeOption);
+
+        bool recallInitUIParent = false;
+        if (materialUIRects == null)
+        {
+            recallInitUIParent = true;
+        }
+        else if (materialUIRects.Length != commandCount)
+        {
+            recallInitUIParent = true;
+        }
+        if (recallInitUIParent)
+        {
+            Debug.LogWarning("UI要素の配列が初期化されていないか、コマンド数と一致しません。UIの親オブジェクトを再初期化します。");
+            EditorApplication.delayCall += InitUIParent; // UIの親オブジェクトを初期化
+            return;
+        }
+
+            // UIの配置とスタイルを設定
+            for (int i = 0; i < commandCount; i++)
         {
             materialUIRects[i].anchoredPosition = commandPosition + new Vector2(0, -commandDelta.y * i);
             actionUIRects[i].anchoredPosition = commandPosition + new Vector2(commandDelta.x, -commandDelta.y * i);
@@ -321,29 +433,47 @@ public class CookingCommandBehaviour : MonoBehaviour
             Button actionLeftButton = actionLeftButtons[i];
             Button actionRightButton = actionRightButtons[i];
 
+            // テキストのスタイルを設定
+            materialUIText.rectTransform.anchoredPosition = commandTextPosition;
+            materialUIText.rectTransform.sizeDelta = textSize;
             materialUIText.font = fontAsset;
-            materialUIText.fontSize = fontSize;
             materialUIText.color = fontColor;
-            materialUIText.GetComponent<RectTransform>().anchoredPosition = commandTextPosition;
-            materialUIText.GetComponent<RectTransform>().sizeDelta = textSize;
-            materialLeftButton.GetComponent<Image>().sprite = leftButtonSprite;
+            materialUIText.fontSize = fontSize;
+            actionUIText.rectTransform.anchoredPosition = commandTextPosition;
+            actionUIText.rectTransform.sizeDelta = textSize;
+            actionUIText.font = fontAsset;
+            actionUIText.color = fontColor;
+            actionUIText.fontSize = fontSize;
+
+            // ボタンのスタイルを設定
             materialLeftButton.GetComponent<RectTransform>().anchoredPosition = commandLeftButtonPosition;
             materialLeftButton.GetComponent<RectTransform>().sizeDelta = ButtonSize;
-            materialRightButton.GetComponent<Image>().sprite = rightButtonSprite;
+            Image materialLeftButtonImage = materialLeftButton.GetComponent<Image>();
+            if (materialLeftButtonImage != null && leftButtonSprite != null)
+            {
+                materialLeftButtonImage.sprite = leftButtonSprite;
+            }
             materialRightButton.GetComponent<RectTransform>().anchoredPosition = commandRightButtonPosition;
             materialRightButton.GetComponent<RectTransform>().sizeDelta = ButtonSize;
-
-            actionUIText.font = fontAsset;
-            actionUIText.fontSize = fontSize;
-            actionUIText.color = fontColor;
-            actionUIText.GetComponent<RectTransform>().anchoredPosition = commandTextPosition;
-            actionUIText.GetComponent<RectTransform>().sizeDelta = textSize;
-            actionLeftButton.GetComponent<Image>().sprite = leftButtonSprite;
+            Image materialRightButtonImage = materialRightButton.GetComponent<Image>();
+            if (materialRightButtonImage != null && rightButtonSprite != null)
+            {
+                materialRightButtonImage.sprite = rightButtonSprite;
+            }
             actionLeftButton.GetComponent<RectTransform>().anchoredPosition = commandLeftButtonPosition;
             actionLeftButton.GetComponent<RectTransform>().sizeDelta = ButtonSize;
-            actionRightButton.GetComponent<Image>().sprite = rightButtonSprite;
+            Image actionLeftButtonImage = actionLeftButton.GetComponent<Image>();
+            if (actionLeftButtonImage != null && leftButtonSprite != null)
+            {
+                actionLeftButtonImage.sprite = leftButtonSprite;
+            }
             actionRightButton.GetComponent<RectTransform>().anchoredPosition = commandRightButtonPosition;
             actionRightButton.GetComponent<RectTransform>().sizeDelta = ButtonSize;
+            Image actionRightButtonImage = actionRightButton.GetComponent<Image>();
+            if (actionRightButtonImage != null && rightButtonSprite != null)
+            {
+                actionRightButtonImage.sprite = rightButtonSprite;
+            }
 
             // ボタンのクリックイベントを設定
             int commandIndex = i; // ローカル変数を使用してクロージャーの問題を回避
@@ -355,12 +485,73 @@ public class CookingCommandBehaviour : MonoBehaviour
             materialRightButton.onClick.AddListener(() => SetMaterial(commandIndex, (chobins[currentChobinUIIndex].materialIndex[commandIndex] + 1) % MaterialList.Length));
             actionLeftButton.onClick.AddListener(() => SetAction(commandIndex, (chobins[currentChobinUIIndex].actionIndex[commandIndex] - 1 + ActionList.Length) % ActionList.Length));
             actionRightButton.onClick.AddListener(() => SetAction(commandIndex, (chobins[currentChobinUIIndex].actionIndex[commandIndex] + 1) % ActionList.Length));
+        }
+    }
 
-            // 初期化時に各チョビンの食材と調理法を設定
-            for (int j = 0; j < chobins.Length; j++)
+    private void InitChobinButtonParent()
+    {
+        // 既存のUIオブジェクトを削除
+        while (chobinButtonCanvas.transform.childCount > 0)
+        {
+            DestroyImmediate(chobinButtonCanvas.transform.GetChild(0).gameObject);
+        }
+        for (int i = 0; i < chobins.Length; i++)
+        {
+            GameObject chobinButtonObject = null;
+#if UNITY_EDITOR
+            chobinButtonObject = UnityEditor.PrefabUtility.InstantiatePrefab(chobinButtonPrefab, chobinButtonCanvas.transform) as GameObject;
+#else
+            chobinButtonObject = Instantiate(chobinButtonPrefab, chobinButtonCanvas.transform);
+#endif
+            chobinButtonObject.name = chobinButtonPrefabName + "_" + i; // チョビンボタンの名前を設定
+        }
+
+        InitChobins();
+#if UNITY_EDITOR
+        EditorApplication.delayCall -= InitChobinButtonParent; // 一度だけ実行するために解除
+#endif
+    }
+
+    private void InitChobins()
+    {
+        chobinButtonSize = SpriteSize(chobinButtonSprite, chobinButtonSize, chobinButtonSizeOption);
+
+        for (int i = 0; i < chobins.Length; i++)
+        {
+            // UIの位置を設定
+            GameObject chobinButtonObject = chobinButtonCanvas.transform.GetChild(i).gameObject;
+            RectTransform chobinButtonRect = chobinButtonObject.GetComponent<RectTransform>();
+            chobinButtonRect.sizeDelta = chobinButtonSize;
+            Button chobinButton = chobinButtonObject.GetComponent<Button>();
+            Image chobinImage = chobinButtonObject.GetComponent<Image>();
+            if (chobinImage != null)
             {
-                chobins[j].SetMaterial(commandIndex, 0);
-                chobins[j].SetAction(commandIndex, 0, ActionList[0].KitchinSpot);
+                chobinImage.sprite = chobinButtonSprite;
+            }
+            if (chobinButton != null)
+            {
+                int chobinIndex = i; // ローカル変数を使用してクロージャーの問題を回避
+                chobinButton.onClick.RemoveAllListeners();
+                chobinButton.onClick.AddListener(() => ShowCommand(chobinIndex));
+            }
+
+            if (chobins[i] != null)
+            {
+                NavMeshAgent agent = chobins[i].GetComponent<NavMeshAgent>();
+                if (agent != null)
+                {
+                    agent.speed = chobinSpeed;
+                    agent.acceleration = chobinAcceleration;
+                }
+                chobins[i].SetWaitingSpot(WaitingSpot, waitingSpotRadius);
+                chobins[i].SetSelectButton(chobinButtonObject, chobinButtonOffset);
+                chobins[i].SetPerformingTimeLength(performingTimeLength);
+                chobins[i].Init(i, commandCount);
+                for (int j = 0; j < commandCount; j++)
+                {
+                    chobins[i].SetMaterial(j, 0); // 初期化時に食材を設定
+                    chobins[i].SetAction(j, 0, ActionList[0].KitchinSpot); // 初期化時に調理法を設定
+                }
             }
         }
     }
@@ -411,32 +602,52 @@ public class CookingCommandBehaviour : MonoBehaviour
         actionUITexts[commandIndex].text = ActionList[chobins[currentChobinUIIndex].actionIndex[commandIndex]].Name;
     }
 
+    private Vector2 SpriteSize(Sprite sprite, Vector2 targetSize, SpriteSizeOption spriteSizeOption)
+    {
+        Vector2 newSize = targetSize;
+        switch (spriteSizeOption)
+        {
+            case SpriteSizeOption.NonKeepAspect:
+                // そのまま
+                break;
+            case SpriteSizeOption.KeepAspectWithCurrentWidth:
+                if (sprite != null)
+                {
+                    float aspectRatio = sprite.rect.height / sprite.rect.width;
+                    newSize.y = newSize.x * aspectRatio;
+                }
+                break;
+            case SpriteSizeOption.KeepAspectWithCurrentHeight:
+                if (sprite != null)
+                {
+                    float aspectRatio = sprite.rect.width / sprite.rect.height;
+                    newSize.x = newSize.y * aspectRatio;
+                }
+                break;
+        }
+        return newSize;
+    }
+
+    public void ShowCommand(int chobinIndex)
+    {
+        if (chobinIndex < 0 || chobinIndex >= chobins.Length)
+        {
+            Debug.LogError($"チョビンインデックス {chobinIndex} が範囲外です。0から{chobins.Length - 1}の範囲で指定してください。");
+            return;
+        }
+        commandCanvas.SetActive(true);
+        currentChobinUIIndex = chobinIndex;
+        for (int i = 0; i < commandCount; i++)
+        {
+            SetMaterial(i, 0); // 食材のテキストを初期化
+            SetAction(i, 0); // 調理法のテキストを初期化
+        }
+    }
+
     public void SubmitCommand()
     {
-        for (int i = 0; i < chobins.Length; i++)
-        {
-            chobins[i].SetState(ChobinBehaviour.Status.Moving);
-        }
-    }
-
-    public void NextChobin()
-    {
-        currentChobinUIIndex = (currentChobinUIIndex + 1) % chobins.Length;
-        for (int i = 0; i < commandCount; i++)
-        {
-            UpdateMaterialText(i);
-            UpdateActionText(i);
-        }
-    }
-
-    public void PreviousChobin()
-    {
-        currentChobinUIIndex = (currentChobinUIIndex - 1 + chobins.Length) % chobins.Length;
-        for (int i = 0; i < commandCount; i++)
-        {
-            UpdateMaterialText(i);
-            UpdateActionText(i);
-        }
+        chobins[currentChobinUIIndex].SetCommand();
+        commandCanvas.SetActive(false);
     }
 
 #if UNITY_EDITOR
@@ -446,7 +657,10 @@ public class CookingCommandBehaviour : MonoBehaviour
     private void OnValidate()
     {
         // 初期化処理を呼び出す
-        Init();
+        if (!EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            ChackSettings();
+        }
     }
 #endif
 }
