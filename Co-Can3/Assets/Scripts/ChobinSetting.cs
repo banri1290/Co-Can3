@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-
 public class ChobinSetting : MonoBehaviour
 {
     enum SpriteSizeOption

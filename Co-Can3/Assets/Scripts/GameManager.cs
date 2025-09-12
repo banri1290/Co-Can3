@@ -6,13 +6,13 @@ using UnityEditor;
 public class GameManager : MonoBehaviour
 {
     [System.Serializable]
-    private struct Material
+    public struct Material
     {
         [SerializeField] private string name; // 食材の名前
         public string Name => name; // 食材の名前を取得
     }
     [System.Serializable]
-    private struct Action
+    public struct Action
     {
         [SerializeField] private string name; // 調理法の名前
         [SerializeField] private Transform kitchinSpot; // 調理場の位置
