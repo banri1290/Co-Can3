@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -66,21 +65,25 @@ public class ChobinBehaviour : MonoBehaviour
         MaterialIndex = new int[count];
         ActionIndex = new int[count];
         SetState(Status.CommandWaitiating);
+        CommandWaiting();
         for (int i = 0; i < count; i++)
         {
             target[i] = null;
             MaterialIndex[i] = 0;
             ActionIndex[i] = 0;
+
+            SetMaterial(i, 0);
+            SetAction(i, 0, target[0]);
         }
     }
 
-    public void SetWaitingSpot(Transform _waitingSpot,float _waitingSpotRadius)
+    public void SetWaitingSpot(Transform _waitingSpot, float _waitingSpotRadius)
     {
         waitingSpot = _waitingSpot;
         waitingSpotRadius = _waitingSpotRadius;
     }
 
-    public void SetSelectButton(GameObject _selectButton,Vector3 _selectButtonOffset)
+    public void SetSelectButton(GameObject _selectButton, Vector3 _selectButtonOffset)
     {
         selectButton = _selectButton;
         selectButtonOffset = _selectButtonOffset;
@@ -150,7 +153,7 @@ public class ChobinBehaviour : MonoBehaviour
     void SetState(Status s)
     {
         status = s;
-        switch(status)
+        switch (status)
         {
             case Status.CommandWaitiating:
                 selectButton.SetActive(true);
