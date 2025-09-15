@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class ChobinBehaviour : MonoBehaviour
 {
@@ -8,15 +9,19 @@ public class ChobinBehaviour : MonoBehaviour
         CommandWaitiating = 0,
         Moving = 1,
         Performing = 2,
-        BackToWaitingSpot = 3
+        ServingDish = 3,
+        BackToWaitingSpot = 4
     }
 
     [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private GameObject selectButton;
     [SerializeField] private Transform waitingSpot;
+    [SerializeField] private Transform servingSpot;
     [SerializeField] private Vector3 selectButtonOffset = new Vector3(0f, 2f, 0f);
     [SerializeField] private float performingTimeLength = 2f;
     [SerializeField] private float waitingSpotRadius = 1f;
+
+    private UnityEvent serveEvent = new();
 
     private Transform[] target;
     private int[] MaterialIndex;
@@ -25,7 +30,9 @@ public class ChobinBehaviour : MonoBehaviour
     private int currentIndex;
     private Status status;
     private float performingTime;
+    private bool hasGuestWaitingForOrderFlag;
 
+    public GameObject SelectButton => selectButton;
     public int[] materialIndex => MaterialIndex;
     public int[] actionIndex => ActionIndex;
     public int ID => id;
@@ -34,8 +41,8 @@ public class ChobinBehaviour : MonoBehaviour
     void Start()
     {
         currentIndex = 0;
-        status = Status.CommandWaitiating;
         performingTime = 0f;
+        hasGuestWaitingForOrderFlag = false;
     }
 
     // Update is called once per frame
@@ -51,6 +58,9 @@ public class ChobinBehaviour : MonoBehaviour
                 break;
             case Status.Performing:
                 PerformingBehave();
+                break;
+            case Status.ServingDish:
+                ServingDishBehave();
                 break;
             case Status.BackToWaitingSpot:
                 BackToWaitingSpot();
@@ -81,6 +91,11 @@ public class ChobinBehaviour : MonoBehaviour
     {
         waitingSpot = _waitingSpot;
         waitingSpotRadius = _waitingSpotRadius;
+    }
+
+    public void SetServingSpot(Transform _servingSpot)
+    {
+        servingSpot = _servingSpot;
     }
 
     public void SetSelectButton(GameObject _selectButton, Vector3 _selectButtonOffset)
@@ -120,8 +135,16 @@ public class ChobinBehaviour : MonoBehaviour
             }
             else
             {
-                SetState(Status.BackToWaitingSpot);
+                SetState(Status.ServingDish);
             }
+        }
+    }
+
+    void ServingDishBehave()
+    {
+        if ((transform.position - servingSpot.position).magnitude < 0.1)
+        {
+            SetState(Status.BackToWaitingSpot);
         }
     }
 
@@ -144,8 +167,15 @@ public class ChobinBehaviour : MonoBehaviour
         target[index] = tar;
     }
 
-    public void SetCommand()
+    public void SetHasGuestFlag(bool flag)
     {
+        hasGuestWaitingForOrderFlag = flag;
+        selectButton.SetActive(flag && status==Status.CommandWaitiating);
+    }
+
+    public void SetCommand(UnityEvent _serveEvent)
+    {
+        serveEvent = _serveEvent;
         currentIndex = 0;
         SetState(Status.Moving);
     }
@@ -156,7 +186,7 @@ public class ChobinBehaviour : MonoBehaviour
         switch (status)
         {
             case Status.CommandWaitiating:
-                selectButton.SetActive(true);
+                selectButton.SetActive(hasGuestWaitingForOrderFlag);
                 break;
             case Status.Moving:
                 navAgent.SetDestination(target[currentIndex].position);
@@ -166,7 +196,11 @@ public class ChobinBehaviour : MonoBehaviour
                 performingTime = performingTimeLength;
                 transform.rotation = target[currentIndex].rotation;
                 break;
+            case Status.ServingDish:
+                navAgent.SetDestination(servingSpot.position);
+                break;
             case Status.BackToWaitingSpot:
+                serveEvent.Invoke();
                 navAgent.SetDestination(waitingSpot.position);
                 break;
         }
