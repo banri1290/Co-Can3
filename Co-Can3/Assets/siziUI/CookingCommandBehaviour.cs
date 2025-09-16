@@ -30,7 +30,7 @@ public class CookingCommandBehaviour : MonoBehaviour
     [SerializeField] private GameObject commandUIParent; // UIの親オブジェクトを登録
     [SerializeField] private string materialUIPrefabName = "MaterialUI"; // 食材UIの名前
     [SerializeField] private string actionUIPrefabName = "ActionUI"; // 調理法UIの名前
-    [SerializeField] private bool commandCanvasStartActive = false; // ゲーム開始時にコマンドUIを表示するか
+    [SerializeField] private bool commandCanvasIsActiveInEditor = false; // ゲーム開始時にコマンドUIを表示するか
 
     [Header("リストの配置")]
     [SerializeField] private int commandCount = 3; // コマンドの数
@@ -83,7 +83,6 @@ public class CookingCommandBehaviour : MonoBehaviour
     void Start()
     {
         currentChobinUIIndex = 0;
-        if (commandCanvasStartActive) commandCanvas.SetActive(false);
     }
 
     // 毎フレームの更新処理（未使用）
@@ -192,14 +191,17 @@ public class CookingCommandBehaviour : MonoBehaviour
     /// </summary>
     public void Init()
     {
-        commandCanvas.SetActive(commandCanvasStartActive);
 #if UNITY_EDITOR
         if (EditorApplication.isPlaying)
         {
+            commandCanvas.SetActive(false);
+
             InitUIParent();
         }
         else
         {
+            commandCanvas.SetActive(commandCanvasIsActiveInEditor);
+
             bool changeCommandCount = (commandUIParent.transform.childCount != commandCount * 2);
             bool changeMaterialUIName = (commandUIParent.transform.GetChild(0).name != materialUIPrefabName + "_0");
             bool changeActionUIName = (commandUIParent.transform.GetChild(1).name != actionUIPrefabName + "_0");
@@ -214,6 +216,7 @@ public class CookingCommandBehaviour : MonoBehaviour
             }
         }
 #else
+        commandCanvas.SetActive(false);
         InitUIParent();
 #endif
 

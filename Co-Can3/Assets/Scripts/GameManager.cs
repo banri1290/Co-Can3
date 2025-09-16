@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Events;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -27,6 +29,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CookingCommandBehaviour cookingCommandBehaviour; // 指示UIを制御するオブジェクト
     [Header("チョビンの設定を一括して管理するオブジェクト")]
     [SerializeField] private ChobinSetting chobinSetting; // チョビンの設定を一括して管理するオブジェクト
+    [Header("客を呼び出して管理するオブジェクト")]
+    [SerializeField] private GuestCtrl guestCtrl; // 客を呼び出して管理するオブジェクト
 
     // Start is called before the first frame update
     void Start()
@@ -73,6 +77,9 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            cookingCommandBehaviour.CheckAllSettings.RemoveAllListeners();
+            cookingCommandBehaviour.CheckAllSettings.AddListener(CheckSettingOnValidate);
+
             bool cookingCommandBehaviourSettingsAreCorrect = cookingCommandBehaviour.CheckSettings();
             if (!cookingCommandBehaviourSettingsAreCorrect)
             {
@@ -88,11 +95,32 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            chobinSetting.CheckAllSettings.RemoveAllListeners();
+            chobinSetting.CheckAllSettings.AddListener(CheckSettingOnValidate);
+
             bool chobinSettingSettingsAreCorrect = chobinSetting.CheckSettings();
             if (!chobinSettingSettingsAreCorrect)
             {
                 AllSettingsAreCorrect = false;
                 Debug.LogError("チョビンの設定を一括して管理するオブジェクトの設定に誤りがあります。");
+            }
+        }
+
+        if (guestCtrl == null)
+        {
+            AllSettingsAreCorrect = false;
+            Debug.LogError("客を呼び出して管理するオブジェクトが設定されていません。");
+        }
+        else
+        {
+            guestCtrl.CheckAllSettings.RemoveAllListeners();
+            guestCtrl.CheckAllSettings.AddListener(CheckSettingOnValidate);
+
+            bool guestCtrlSettingsAreCorrect = guestCtrl.CheckSetings();
+            if (!guestCtrlSettingsAreCorrect)
+            {
+                AllSettingsAreCorrect = false;
+                Debug.LogError("客を呼び出して管理するオブジェクトの設定に誤りがあります。");
             }
         }
 
@@ -106,19 +134,18 @@ public class GameManager : MonoBehaviour
     {
         InitCookingCommand();
         InitChobinSetting();
+        InitGuestCtrl();
 
         Debug.Log("GameManagerの初期化が正常に完了しました。");
     }
 
     private void InitCookingCommand()
     {
-        cookingCommandBehaviour.CheckAllSettings.RemoveAllListeners();
         cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.NextMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.NextActionEvent.RemoveAllListeners();
 
-        cookingCommandBehaviour.CheckAllSettings.AddListener(CheckSettingOnValidate);
         cookingCommandBehaviour.PreviousMaterialEvent.AddListener(SetPreviousMaterial);
         cookingCommandBehaviour.NextMaterialEvent.AddListener(SetNextMaterial);
         cookingCommandBehaviour.PreviousActionEvent.AddListener(SetPreviousAction);
@@ -130,11 +157,18 @@ public class GameManager : MonoBehaviour
     private void InitChobinSetting()
     {
         chobinSetting.SetCommandCount(cookingCommandBehaviour.CommandCount);
-        chobinSetting.CheckAllSettings.RemoveAllListeners();
         chobinSetting.ShowCommand.RemoveAllListeners();
-        chobinSetting.CheckAllSettings.AddListener(CheckSettingOnValidate);
         chobinSetting.ShowCommand.AddListener(ShowCommand);
         chobinSetting.Init();
+    }
+
+    private void InitGuestCtrl()
+    {
+        guestCtrl.HasGuestWaitingForOrder.RemoveAllListeners();
+        guestCtrl.LeftGuestWaitingForOrder.RemoveAllListeners();
+        guestCtrl.HasGuestWaitingForOrder.AddListener(()=> InformGuestWaitingForOrder(true));
+        guestCtrl.LeftGuestWaitingForOrder.AddListener(() => InformGuestWaitingForOrder(false));
+        guestCtrl.Init();
     }
 
     private void InitCommandTexts(int chobinIndex)
@@ -238,7 +272,18 @@ public class GameManager : MonoBehaviour
 
     private void SubmitCommand(int chobinIndex)
     {
-        GetChobin(chobinIndex).SetCommand();
+        UnityEvent serveDish = new();
+        serveDish.AddListener(() => guestCtrl.ServeDish());
+        GetChobin(chobinIndex).SetCommand(serveDish);
+        guestCtrl.ReceiveOrder();
+    }
+
+    private void InformGuestWaitingForOrder(bool b)
+    {
+        for (int i = 0; i < chobinSetting.Chobins.Length; i++)
+        {
+            GetChobin(i).SetHasGuestFlag(b);
+        }
     }
 
 #if UNITY_EDITOR

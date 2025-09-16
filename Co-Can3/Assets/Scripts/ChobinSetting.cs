@@ -20,6 +20,7 @@ public class ChobinSetting : MonoBehaviour
     [Header("チョビンの設定")]
     [SerializeField] private ChobinBehaviour[] chobins;
     [SerializeField] private Transform WaitingSpot; // 待機場所
+    [SerializeField] private Transform ServingSpot; // 料理を提供する場所
     [SerializeField] private float chobinSpeed; // チョビンの移動速度
     [SerializeField] private float chobinAcceleration; // チョビンの加速度
     [SerializeField] private float performingTimeLength = 2f; // 調理にかかる時間
@@ -33,6 +34,7 @@ public class ChobinSetting : MonoBehaviour
     [SerializeField] private Vector3 chobinButtonOffset; // チョビンのUIの位置
     [SerializeField] private Vector2 chobinButtonSize; // チョビンのUIのサイズ
     [SerializeField] private SpriteSizeOption chobinButtonSizeOption = SpriteSizeOption.NonKeepAspect; // チョビンのUIのサイズオプション
+    [SerializeField] private bool buttonIsActiveInEditor = true; // チョビンのUIを表示するかどうか
 
     private UnityEvent checkAllSettings = new();
     private ShowCommandEvent showCommandEvent = new();
@@ -87,6 +89,11 @@ public class ChobinSetting : MonoBehaviour
         {
             AllSettingAreCorrect = false;
             Debug.LogError("待機場所のTransformが設定されていません。");
+        }
+        if (ServingSpot == null)
+        {
+            AllSettingAreCorrect = false;
+            Debug.LogError("料理を提供する場所のTransformが設定されていません。");
         }
 
         if (chobinButtonCanvas == null)
@@ -169,9 +176,9 @@ public class ChobinSetting : MonoBehaviour
         {
             // UIの位置を設定
             GameObject chobinButtonObject = chobinButtonCanvas.transform.GetChild(i).gameObject;
+            Button chobinButton = chobinButtonObject.GetComponent<Button>();
             RectTransform chobinButtonRect = chobinButtonObject.GetComponent<RectTransform>();
             chobinButtonRect.sizeDelta = chobinButtonSize;
-            Button chobinButton = chobinButtonObject.GetComponent<Button>();
             Image chobinImage = chobinButtonObject.GetComponent<Image>();
             if (chobinImage != null)
             {
@@ -193,10 +200,24 @@ public class ChobinSetting : MonoBehaviour
                     agent.acceleration = chobinAcceleration;
                 }
                 chobins[i].SetWaitingSpot(WaitingSpot, waitingSpotRadius);
+                chobins[i].SetServingSpot(ServingSpot);
                 chobins[i].SetSelectButton(chobinButtonObject, chobinButtonOffset);
                 chobins[i].SetPerformingTimeLength(performingTimeLength);
                 chobins[i].Init(i, commandCount);
             }
+
+#if UNITY_EDITOR
+            if (EditorApplication.isPlaying)
+            {
+                chobinButtonObject.SetActive(false);
+            }
+            else
+            {
+                chobinButtonObject.SetActive(buttonIsActiveInEditor);
+            }
+#else
+            chobinButtonObject.SetActive(false);
+#endif
         }
     }
 
