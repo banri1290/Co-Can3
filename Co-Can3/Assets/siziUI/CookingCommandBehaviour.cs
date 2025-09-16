@@ -1,7 +1,7 @@
 //======================================================================
 // CookingCommandBehaviour.cs
-// —¿—ƒRƒ}ƒ“ƒh‚ÌUI§Œä‚ğs‚¤MonoBehaviour
-// ŠeƒRƒ}ƒ“ƒh‚ÌŞ—¿EƒAƒNƒVƒ‡ƒ“‚ÌƒeƒLƒXƒg‚Æƒ{ƒ^ƒ“‚Ì”z’uE‘€ì‚ğŠÇ—‚µ‚Ü‚·
+// ï¿½ï¿½ï¿½ï¿½ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½MonoBehaviour
+// ï¿½eï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ÌŞ—ï¿½ï¿½Eï¿½Aï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ìƒeï¿½Lï¿½Xï¿½gï¿½Æƒ{ï¿½^ï¿½ï¿½ï¿½Ì”zï¿½uï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç—ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
 //======================================================================
 
 using TMPro;
@@ -17,40 +17,39 @@ public class CookingCommandBehaviour : MonoBehaviour
 {
     enum SpriteSizeOption
     {
-        NonKeepAspect, // ƒAƒXƒyƒNƒg”ä‚ğˆÛ‚µ‚È‚¢
-        KeepAspectWithCurrentWidth, // Œ»İ‚Ì•‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
-        KeepAspectWithCurrentHeight, // Œ»İ‚Ì‚‚³‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
+        NonKeepAspect, // ï¿½Aï¿½Xï¿½yï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½È‚ï¿½
+        KeepAspectWithCurrentWidth, // ï¿½ï¿½ï¿½İ‚Ì•ï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ÄƒAï¿½Xï¿½yï¿½Nï¿½gï¿½ï¿½ğ’²ï¿½
+        KeepAspectWithCurrentHeight, // ï¿½ï¿½ï¿½İ‚Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ÄƒAï¿½Xï¿½yï¿½Nï¿½gï¿½ï¿½ğ’²ï¿½
     }
-
     public class SelectCommandEvent : UnityEvent<int, int> { }
 
-    [Header("‚±‚±‚ÉHŞE’²—–@‚ğ‘I‘ğ‚·‚éUI‚ğD&D")]
-    [SerializeField] private GameObject commandUIPrefab; // UIƒvƒŒƒnƒu‚ğ“o˜^
-    [SerializeField] private GameObject commandCanvas; // CanvasƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-    [SerializeField] private GameObject commandUIParent; // UI‚ÌeƒIƒuƒWƒFƒNƒg‚ğ“o˜^
-    [SerializeField] private string materialUIPrefabName = "MaterialUI"; // HŞUI‚Ì–¼‘O
-    [SerializeField] private string actionUIPrefabName = "ActionUI"; // ’²—–@UI‚Ì–¼‘O
-    [SerializeField] private bool commandCanvasStartActive = false; // ƒQ[ƒ€ŠJn‚ÉƒRƒ}ƒ“ƒhUI‚ğ•\¦‚·‚é‚©
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ÉHï¿½ŞEï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UIï¿½ï¿½D&D")]
+    [SerializeField] private GameObject commandUIPrefab; // UIï¿½vï¿½ï¿½ï¿½nï¿½uï¿½ï¿½oï¿½^
+    [SerializeField] private GameObject commandCanvas; // Canvasï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½oï¿½^
+    [SerializeField] private GameObject commandUIParent; // UIï¿½Ìeï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½oï¿½^
+    [SerializeField] private string materialUIPrefabName = "MaterialUI"; // ï¿½Hï¿½ï¿½UIï¿½Ì–ï¿½ï¿½O
+    [SerializeField] private string actionUIPrefabName = "ActionUI"; // ï¿½ï¿½ï¿½ï¿½ï¿½@UIï¿½Ì–ï¿½ï¿½O
+    [SerializeField] private bool commandCanvasStartActive = false; // ï¿½Qï¿½[ï¿½ï¿½ï¿½Jï¿½nï¿½ï¿½ï¿½ÉƒRï¿½}ï¿½ï¿½ï¿½hUIï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½é‚©
 
-    [Header("ƒŠƒXƒg‚Ì”z’u")]
-    [SerializeField] private int commandCount = 3; // ƒRƒ}ƒ“ƒh‚Ì”
-    [SerializeField] private Vector2 commandPosition;           // ƒRƒ}ƒ“ƒh‚ÌŠî€ˆÊ’u
-    [SerializeField] private Vector2 commandDelta;              // ƒRƒ}ƒ“ƒh‚²‚Æ‚ÌƒIƒtƒZƒbƒg
-    [SerializeField] private Vector2 commandTextPosition;       // ƒeƒLƒXƒg‚ÌˆÊ’u
-    [SerializeField] private Vector2 commandLeftButtonPosition; // ¶ƒ{ƒ^ƒ“‚ÌˆÊ’u
-    [SerializeField] private Vector2 commandRightButtonPosition;// ‰Eƒ{ƒ^ƒ“‚ÌˆÊ’u
-    [Header("ƒtƒHƒ“ƒg‚ğ‘€ì")]
-    [SerializeField] private TMP_FontAsset fontAsset;          // g—p‚·‚éƒtƒHƒ“ƒgƒAƒZƒbƒg
-    [SerializeField] private Color fontColor = Color.white; // ƒtƒHƒ“ƒgƒJƒ‰[
-    [SerializeField] private float fontSize = 16f;              // ƒtƒHƒ“ƒgƒTƒCƒY
-    [SerializeField] private Vector2 textSize = new Vector2(200, 30); // ƒeƒLƒXƒgƒTƒCƒY
-    [Header("ƒ{ƒ^ƒ“‚ğ‘€ì")]
-    [SerializeField] private Sprite leftButtonSprite;  // ¶ƒ{ƒ^ƒ“‚ÌƒXƒvƒ‰ƒCƒg
-    [SerializeField] private Sprite rightButtonSprite; // ‰Eƒ{ƒ^ƒ“‚ÌƒXƒvƒ‰ƒCƒg
-    [SerializeField] private Vector2 ButtonSize = new Vector2(100, 100); // ƒ{ƒ^ƒ“ƒTƒCƒY
-    [SerializeField] private SpriteSizeOption buttonSizeOption = SpriteSizeOption.NonKeepAspect; // ƒ{ƒ^ƒ“ƒTƒCƒYƒIƒvƒVƒ‡ƒ“
+    [Header("ï¿½ï¿½ï¿½Xï¿½gï¿½Ì”zï¿½u")]
+    [SerializeField] private int commandCount = 3; // ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½Ìï¿½
+    [SerializeField] private Vector2 commandPosition;           // ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ÌŠî€ï¿½Ê’u
+    [SerializeField] private Vector2 commandDelta;              // ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Æ‚ÌƒIï¿½tï¿½Zï¿½bï¿½g
+    [SerializeField] private Vector2 commandTextPosition;       // ï¿½eï¿½Lï¿½Xï¿½gï¿½ÌˆÊ’u
+    [SerializeField] private Vector2 commandLeftButtonPosition; // ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’u
+    [SerializeField] private Vector2 commandRightButtonPosition;// ï¿½Eï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’u
+    [Header("ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ğ‘€ï¿½")]
+    [SerializeField] private TMP_FontAsset fontAsset;          // ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½Aï¿½Zï¿½bï¿½g
+    [SerializeField] private Color fontColor = Color.white; // ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½Jï¿½ï¿½ï¿½[
+    [SerializeField] private float fontSize = 16f;              // ï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½Tï¿½Cï¿½Y
+    [SerializeField] private Vector2 textSize = new Vector2(200, 30); // ï¿½eï¿½Lï¿½Xï¿½gï¿½Tï¿½Cï¿½Y
+    [Header("ï¿½{ï¿½^ï¿½ï¿½ï¿½ğ‘€ï¿½")]
+    [SerializeField] private Sprite leftButtonSprite;  // ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌƒXï¿½vï¿½ï¿½ï¿½Cï¿½g
+    [SerializeField] private Sprite rightButtonSprite; // ï¿½Eï¿½{ï¿½^ï¿½ï¿½ï¿½ÌƒXï¿½vï¿½ï¿½ï¿½Cï¿½g
+    [SerializeField] private Vector2 ButtonSize = new Vector2(100, 100); // ï¿½{ï¿½^ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+    [SerializeField] private SpriteSizeOption buttonSizeOption = SpriteSizeOption.NonKeepAspect; // ï¿½{ï¿½^ï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½Iï¿½vï¿½Vï¿½ï¿½ï¿½ï¿½
 
-    // UI—v‘f‚ÌQÆ
+    // UIï¿½vï¿½fï¿½ÌQï¿½ï¿½
     private RectTransform[] materialUIRects;
     private TextMeshProUGUI[] materialUITexts;
     private Button[] materialLeftButtons;
@@ -69,7 +68,7 @@ public class CookingCommandBehaviour : MonoBehaviour
 
     private int currentChobinUIIndex;
 
-    public int CommandCount => commandCount; // ƒRƒ}ƒ“ƒh‚Ì”
+    public int CommandCount => commandCount; // ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½Ìï¿½
     public int CurrentChobinUIIndex => currentChobinUIIndex;
 
     public UnityEvent CheckAllSettings => checkAllSettings;
@@ -79,62 +78,62 @@ public class CookingCommandBehaviour : MonoBehaviour
     public SelectCommandEvent NextActionEvent => nextActionEvent;
     public UnityEvent SubmitCommandEvent => submitCommandEvent;
 
-    // ‰Šú‰»ˆ—
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     void Start()
     {
         currentChobinUIIndex = 0;
         if (commandCanvasStartActive) commandCanvas.SetActive(false);
     }
 
-    // –ˆƒtƒŒ[ƒ€‚ÌXVˆ—i–¢g—pj
+    // ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÌXï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½gï¿½pï¿½j
     void Update()
     {
 
     }
 
     /// <summary>
-    /// İ’è‚ÌŠm”F‚ÆUI‚Ì‰Šú‰»
+    /// ï¿½İ’ï¿½ÌŠmï¿½Fï¿½ï¿½UIï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public bool CheckSettings()
     {
         bool commandUIisCorrect = true;
 
-        // UI‚Ì”‚ğ’²®
+        // UIï¿½Ìï¿½ï¿½ğ’²ï¿½
         if (commandCount < 1)
         {
             commandCount = 1;
         }
-        // ƒ{ƒ^ƒ“‚ÌxÀ•W‚ğ’²®
+        // ï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Wï¿½ğ’²ï¿½
         if (commandLeftButtonPosition.x >= 0)
         {
-            commandLeftButtonPosition.x = -1e-5f; // ¶ƒ{ƒ^ƒ“‚ÌˆÊ’u‚ª‰E‘¤‚É—ˆ‚È‚¢‚æ‚¤‚É‚·‚é
-            Debug.LogWarning("¶ƒ{ƒ^ƒ“‚ÌˆÊ’u‚ª‰E‘¤‚Éİ’è‚³‚ê‚Ä‚¢‚Ü‚·B¶ƒ{ƒ^ƒ“‚Í¶‘¤‚É”z’u‚µ‚Ä‚­‚¾‚³‚¢B");
+            commandLeftButtonPosition.x = -1e-5f; // ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½É—ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½
+            Debug.LogWarning("ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½Éİ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½Íï¿½ï¿½ï¿½ï¿½É”zï¿½uï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B");
         }
         if (commandRightButtonPosition.x <= 0)
         {
-            commandRightButtonPosition.x = 1e-5f; // ‰Eƒ{ƒ^ƒ“‚ÌˆÊ’u‚ª¶‘¤‚É—ˆ‚È‚¢‚æ‚¤‚É‚·‚é
-            Debug.LogWarning("‰Eƒ{ƒ^ƒ“‚ÌˆÊ’u‚ª¶‘¤‚Éİ’è‚³‚ê‚Ä‚¢‚Ü‚·B‰Eƒ{ƒ^ƒ“‚Í‰E‘¤‚É”z’u‚µ‚Ä‚­‚¾‚³‚¢B");
+            commandRightButtonPosition.x = 1e-5f; // ï¿½Eï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É—ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½
+            Debug.LogWarning("ï¿½Eï¿½{ï¿½^ï¿½ï¿½ï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éİ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½Eï¿½{ï¿½^ï¿½ï¿½ï¿½Í‰Eï¿½ï¿½ï¿½É”zï¿½uï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B");
         }
 
         if (commandCanvas == null)
         {
             commandUIisCorrect = false;
-            Debug.LogError("w¦UI‚ğ•\¦‚·‚éCanvasƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("ï¿½wï¿½ï¿½UICanvasï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½İ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
         }
 
         if (commandUIParent == null)
         {
             commandUIisCorrect = false;
-            Debug.LogError("ƒRƒ}ƒ“ƒhUI‚ÌeƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("ï¿½Rï¿½}ï¿½ï¿½ï¿½hUIï¿½Ìeï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½İ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
         }
 
-        // HŞE’²—–@ƒIƒuƒWƒFƒNƒg‚ªnull‚Å‚È‚¢‚©Šm”F
+        // ï¿½Hï¿½ŞEï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½nullï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½mï¿½F
         if (commandUIPrefab != null)
         {
             bool hasText = false;
             bool hasLeftButton = false;
             bool hasRightButton = false;
-            // HŞƒIƒuƒWƒFƒNƒg‚Ìq—v‘f‚ğƒ`ƒFƒbƒN
+            // ï¿½Hï¿½ŞƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ìqï¿½vï¿½fï¿½ï¿½ï¿½`ï¿½Fï¿½bï¿½N
             foreach (Transform child in commandUIPrefab.transform)
             {
                 if (child.GetComponent<RectTransform>())
@@ -157,7 +156,7 @@ public class CookingCommandBehaviour : MonoBehaviour
                     }
                 }
             }
-            // •K—v‚ÈUI—v‘f‚ª‘µ‚Á‚Ä‚¢‚é‚©”»’è
+            // ï¿½Kï¿½vï¿½ï¿½UIï¿½vï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½
             if (hasText && hasLeftButton && hasRightButton)
             {
             }
@@ -166,29 +165,29 @@ public class CookingCommandBehaviour : MonoBehaviour
                 commandUIisCorrect = false;
                 if (!hasText)
                 {
-                    Debug.LogError("ƒRƒ}ƒ“ƒhUIƒvƒŒƒnƒu‚ÉTextMeshProUGUIƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB");
+                    Debug.LogError("ï¿½Rï¿½}ï¿½ï¿½ï¿½hUIï¿½vï¿½ï¿½ï¿½nï¿½uï¿½ï¿½TextMeshProUGUIï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
                 }
                 if (!hasLeftButton)
                 {
-                    Debug.LogError("ƒRƒ}ƒ“ƒhUIƒvƒŒƒnƒu‚É¶ƒ{ƒ^ƒ“‚ÌButtonƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB");
+                    Debug.LogError("ï¿½Rï¿½}ï¿½ï¿½ï¿½hUIï¿½vï¿½ï¿½ï¿½nï¿½uï¿½Éï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½Buttonï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
                 }
                 if (!hasRightButton)
                 {
-                    Debug.LogError("ƒRƒ}ƒ“ƒhUIƒvƒŒƒnƒu‚É‰Eƒ{ƒ^ƒ“‚ÌButtonƒRƒ“ƒ|[ƒlƒ“ƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB");
+                    Debug.LogError("ï¿½Rï¿½}ï¿½ï¿½ï¿½hUIï¿½vï¿½ï¿½ï¿½nï¿½uï¿½É‰Eï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½Buttonï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
                 }
             }
         }
         else
         {
             commandUIisCorrect = false;
-            Debug.LogError("ƒRƒ}ƒ“ƒhUIƒvƒŒƒnƒu‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("ï¿½Rï¿½}ï¿½ï¿½ï¿½hUIï¿½vï¿½ï¿½ï¿½nï¿½uï¿½ï¿½ï¿½İ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
         }
 
         return commandUIisCorrect;
     }
 
     /// <summary>
-    /// ‰Šú‰»
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public void Init()
     {
@@ -205,19 +204,19 @@ public class CookingCommandBehaviour : MonoBehaviour
             bool changeActionUIName = (commandUIParent.transform.GetChild(1).name != actionUIPrefabName + "_0");
             if (changeCommandCount || changeMaterialUIName || changeActionUIName)
             {
-                Debug.Log("ƒRƒ}ƒ“ƒh”‚ª•ÏX‚³‚ê‚½‚½‚ßAUI‚ğÄ‰Šú‰»‚µ‚Ü‚·B");
-                EditorApplication.delayCall += InitUIParent; // UI‚ÌeƒIƒuƒWƒFƒNƒg‚ğ‰Šú‰»
+                Debug.Log("ï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ÏXï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½ßAUIï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B");
+                EditorApplication.delayCall += InitUIParent; // UIï¿½Ìeï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             }
             else
             {
-                InitUI(); // UI‚ÌƒXƒ^ƒCƒ‹‚ğXV
+                InitUI(); // UIï¿½ÌƒXï¿½^ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½V
             }
         }
 #else
         InitUIParent();
 #endif
 
-        Debug.Log("CookingCommandBehaviour‚Ì‰Šú‰»‚ª³í‚ÉŠ®—¹‚µ‚Ü‚µ‚½B");
+        Debug.Log("CookingCommandBehaviourï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÉŠï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B");
     }
 
     private void InitUIParent()
@@ -231,7 +230,7 @@ public class CookingCommandBehaviour : MonoBehaviour
         actionLeftButtons = new Button[commandCount];
         actionRightButtons = new Button[commandCount];
 
-        // Šù‘¶‚ÌUIƒIƒuƒWƒFƒNƒg‚ğíœ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UIï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½íœ
         while (commandUIParent.transform.childCount > 0)
         {
             DestroyImmediate(commandUIParent.transform.GetChild(0).gameObject);
@@ -248,10 +247,10 @@ public class CookingCommandBehaviour : MonoBehaviour
             materialUIObject = Instantiate(commandUIPrefab, commandUIParent.transform);
             actionUIObject = Instantiate(commandUIPrefab, commandUIParent.transform);
 #endif
-            materialUIObject.name = materialUIPrefabName + "_" + i; // HŞUI‚Ì–¼‘O‚ğİ’è
-            actionUIObject.name = actionUIPrefabName + "_" + i; // ’²—–@UI‚Ì–¼‘O‚ğİ’è
+            materialUIObject.name = materialUIPrefabName + "_" + i; // ï¿½Hï¿½ï¿½UIï¿½Ì–ï¿½ï¿½Oï¿½ï¿½İ’ï¿½
+            actionUIObject.name = actionUIPrefabName + "_" + i; // ï¿½ï¿½ï¿½ï¿½ï¿½@UIï¿½Ì–ï¿½ï¿½Oï¿½ï¿½İ’ï¿½
 
-            // UI‚ÌˆÊ’u‚ğİ’è
+            // UIï¿½ÌˆÊ’uï¿½ï¿½İ’ï¿½
             materialUIRects[i] = materialUIObject.GetComponent<RectTransform>();
             actionUIRects[i] = actionUIObject.GetComponent<RectTransform>();
 
@@ -302,14 +301,14 @@ public class CookingCommandBehaviour : MonoBehaviour
 #if UNITY_EDITOR
         if (!EditorApplication.isPlaying)
         {
-            EditorApplication.delayCall -= InitUIParent; // ˆê“x‚¾‚¯Às‚·‚é‚½‚ß‚É‰ğœ
+            EditorApplication.delayCall -= InitUIParent; // ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½é‚½ï¿½ß‚É‰ï¿½ï¿½ï¿½
         }
 #endif
     }
 
     private void InitUI()
     {
-        //ƒ{ƒ^ƒ“‚ÌƒTƒCƒYƒIƒvƒVƒ‡ƒ“‚É‰‚¶‚ÄƒTƒCƒY‚ğ’²®
+        //ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½Iï¿½vï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½É‰ï¿½ï¿½ï¿½ï¿½ÄƒTï¿½Cï¿½Yï¿½ğ’²ï¿½
         ButtonSize = SpriteSize(leftButtonSprite, ButtonSize, buttonSizeOption);
 #if UNITY_EDITOR
         bool recallInitUIParent = false;
@@ -323,13 +322,13 @@ public class CookingCommandBehaviour : MonoBehaviour
         }
         if (recallInitUIParent)
         {
-            Debug.LogWarning("UI—v‘f‚Ì”z—ñ‚ª‰Šú‰»‚³‚ê‚Ä‚¢‚È‚¢‚©AƒRƒ}ƒ“ƒh”‚Æˆê’v‚µ‚Ü‚¹‚ñBUI‚ÌeƒIƒuƒWƒFƒNƒg‚ğÄ‰Šú‰»‚µ‚Ü‚·B");
-            EditorApplication.delayCall += InitUIParent; // UI‚ÌeƒIƒuƒWƒFƒNƒg‚ğ‰Šú‰»
+            Debug.LogWarning("UIï¿½vï¿½fï¿½Ì”zï¿½ñ‚ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½Aï¿½Rï¿½}ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Æˆï¿½vï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½BUIï¿½Ìeï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B");
+            EditorApplication.delayCall += InitUIParent; // UIï¿½Ìeï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             return;
         }
 #endif
 
-        // UI‚Ì”z’u‚ÆƒXƒ^ƒCƒ‹‚ğİ’è
+        // UIï¿½Ì”zï¿½uï¿½ÆƒXï¿½^ï¿½Cï¿½ï¿½ï¿½ï¿½İ’ï¿½
         for (int i = 0; i < commandCount; i++)
         {
             materialUIRects[i].anchoredPosition = commandPosition + new Vector2(0, -commandDelta.y * i);
@@ -342,7 +341,7 @@ public class CookingCommandBehaviour : MonoBehaviour
             Button actionLeftButton = actionLeftButtons[i];
             Button actionRightButton = actionRightButtons[i];
 
-            // ƒeƒLƒXƒg‚ÌƒXƒ^ƒCƒ‹‚ğİ’è
+            // ï¿½eï¿½Lï¿½Xï¿½gï¿½ÌƒXï¿½^ï¿½Cï¿½ï¿½ï¿½ï¿½İ’ï¿½
             materialUIText.rectTransform.anchoredPosition = commandTextPosition;
             materialUIText.rectTransform.sizeDelta = textSize;
             materialUIText.font = fontAsset;
@@ -354,7 +353,7 @@ public class CookingCommandBehaviour : MonoBehaviour
             actionUIText.color = fontColor;
             actionUIText.fontSize = fontSize;
 
-            // ƒ{ƒ^ƒ“‚ÌƒXƒ^ƒCƒ‹‚ğİ’è
+            // ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌƒXï¿½^ï¿½Cï¿½ï¿½ï¿½ï¿½İ’ï¿½
             materialLeftButton.GetComponent<RectTransform>().anchoredPosition = commandLeftButtonPosition;
             materialLeftButton.GetComponent<RectTransform>().sizeDelta = ButtonSize;
             Image materialLeftButtonImage = materialLeftButton.GetComponent<Image>();
@@ -384,8 +383,8 @@ public class CookingCommandBehaviour : MonoBehaviour
                 actionRightButtonImage.sprite = rightButtonSprite;
             }
 
-            // ƒ{ƒ^ƒ“‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒg‚ğİ’è
-            int commandIndex = i; // ƒ[ƒJƒ‹•Ï”‚ğg—p‚µ‚ÄƒNƒ[ƒWƒƒ[‚Ì–â‘è‚ğ‰ñ”ğ
+            // ï¿½{ï¿½^ï¿½ï¿½ï¿½ÌƒNï¿½ï¿½ï¿½bï¿½Nï¿½Cï¿½xï¿½ï¿½ï¿½gï¿½ï¿½İ’ï¿½
+            int commandIndex = i; // ï¿½ï¿½ï¿½[ï¿½Jï¿½ï¿½ï¿½Ïï¿½ï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½ÄƒNï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½[ï¿½Ì–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             materialLeftButton.onClick.RemoveAllListeners();
             materialRightButton.onClick.RemoveAllListeners();
             actionLeftButton.onClick.RemoveAllListeners();
@@ -430,7 +429,7 @@ public class CookingCommandBehaviour : MonoBehaviour
         switch (spriteSizeOption)
         {
             case SpriteSizeOption.NonKeepAspect:
-                // ‚»‚Ì‚Ü‚Ü
+                // ï¿½ï¿½ï¿½Ì‚Ü‚ï¿½
                 break;
             case SpriteSizeOption.KeepAspectWithCurrentWidth:
                 if (sprite != null)
@@ -461,6 +460,26 @@ public class CookingCommandBehaviour : MonoBehaviour
         submitCommandEvent.Invoke();
         commandCanvas.SetActive(false);
     }
+
+    public string GetMaterialName(int index)
+    {
+        if (materialUITexts != null && index >= 0 && index < materialUITexts.Length)
+            return materialUITexts[index].text;
+        return "";
+    }
+
+    public float GetCookTime()
+    {
+        // ãƒ‡ãƒ¢ç”¨: å®Ÿéš›ã«ã¯UIã®å€¤ã‚„å¤‰æ•°ã‚’å–å¾—
+        return 40f;
+    }
+
+    public int GetSelectedSteps()
+    {
+        // ãƒ‡ãƒ¢ç”¨: å®Ÿéš›ã«ã¯UIã®å€¤ã‚„å¤‰æ•°ã‚’å–å¾—
+        return 3;
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

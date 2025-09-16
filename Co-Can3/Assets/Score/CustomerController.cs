@@ -11,20 +11,16 @@ public class CustomerController : MonoBehaviour
     void OnMouseDown()
     {
         // 1. 選択中の材料をDishに反映
-        currentDish.Ingredients.Clear();
-        for (int i = 0; i < commandUI.CommandCount; i++)
-        {
-            string ingredientName = commandUI.CurrentChobinUIIndex == i 
-                ? commandUI.CurrentChobinUIIndex.ToString() // ここはUpdateMaterialTextで管理しているテキスト名に置き換え
-                : "";
-            if (!string.IsNullOrEmpty(ingredientName))
-                currentDish.Ingredients.Add(ingredientName);
-        }
-
+ currentDish.Ingredients.Clear();
+for (int i = 0; i < commandUI.CommandCount; i++)
+{
+    string ingredientName = commandUI.GetMaterialName(i); // ←ここで実際の材料名を取得
+    if (!string.IsNullOrEmpty(ingredientName))
+        currentDish.AddIngredient(ingredientName);
+}
         // 2. 調理時間や工程は仮でセット
-        currentDish.CookTime = 40f; // デモ用
-        currentDish.Steps = 3;
-
+    currentDish.CookTime = commandUI.GetCookTime();  // もし未実装なら追加
+currentDish.Steps = commandUI.GetSelectedSteps(); // もし未実装なら追加
         // 3. スコア計算
         int score = scoreManager.CalculateScore(customer, currentDish);
         string face = scoreManager.GetEvaluationFace(score);
