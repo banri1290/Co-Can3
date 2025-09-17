@@ -186,6 +186,7 @@ public class ChobinBehaviour : MonoBehaviour
         switch (status)
         {
             case Status.CommandWaitiating:
+                navAgent.SetDestination(transform.position);
                 selectButton.SetActive(hasGuestWaitingForOrderFlag);
                 break;
             case Status.Moving:
