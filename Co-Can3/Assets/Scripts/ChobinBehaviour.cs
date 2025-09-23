@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class ChobinBehaviour : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class ChobinBehaviour : MonoBehaviour
     [SerializeField] private Vector3 selectButtonOffset = new Vector3(0f, 2f, 0f);
     [SerializeField] private float performingTimeLength = 2f;
     [SerializeField] private float waitingSpotRadius = 1f;
+    [SerializeField] private Slider performingTimeSlider;
 
     private UnityEvent serveEvent = new();
 
@@ -65,6 +67,16 @@ public class ChobinBehaviour : MonoBehaviour
             case Status.BackToWaitingSpot:
                 BackToWaitingSpot();
                 break;
+        }
+
+        if (status == Status.Performing && performingTimeSlider != null)
+        {
+            performingTimeSlider.maxValue = performingTimeLength;
+            performingTimeSlider.value = performingTimeLength - performingTime;
+        }
+        else if (performingTimeSlider != null && status != Status.Performing)
+        {
+            performingTimeSlider.value = 0f;
         }
     }
 
@@ -196,6 +208,11 @@ public class ChobinBehaviour : MonoBehaviour
             case Status.Performing:
                 performingTime = performingTimeLength;
                 transform.rotation = target[currentIndex].rotation;
+                if (performingTimeSlider != null)
+                {
+                    performingTimeSlider.maxValue = performingTimeLength;
+                    performingTimeSlider.value = 0f;
+                }
                 break;
             case Status.ServingDish:
                 navAgent.SetDestination(servingSpot.position);

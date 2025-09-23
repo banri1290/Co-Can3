@@ -25,6 +25,7 @@ public class ChobinSetting : MonoBehaviour
     [SerializeField] private float chobinAcceleration; // チョビンの加速度
     [SerializeField] private float performingTimeLength = 2f; // 調理にかかる時間
     [SerializeField] private float waitingSpotRadius = 1f; // 待機場所の半径
+    [SerializeField] private Slider performingTimeSlider;
 
     [Header("チョビンを選択するボタンと表示するCanvasをD&D")]
     [SerializeField] private GameObject chobinButtonCanvas; // チョビンのUIを表示するCanvas
@@ -56,7 +57,15 @@ public class ChobinSetting : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        // performingTimeLengthの値に応じてSliderを更新
+        if (performingTimeSlider != null)
+        {
+            // 例: performingTimeLengthが最大値、0が最小値
+            performingTimeSlider.maxValue = performingTimeLength;
+            // performingTimeLengthの進行度を表示（ここでは仮に減少していく例）
+            // 実際はChobinBehaviourから進行度を取得して反映するのが理想
+            performingTimeSlider.value = Mathf.Clamp(performingTimeLength, 0, performingTimeSlider.maxValue);
+        }
     }
 
     public bool CheckSettings()
