@@ -470,9 +470,36 @@ public class CookingCommandBehaviour : MonoBehaviour
 
     public float GetCookTime()
     {
-        // デモ用: 実際にはUIの値や変数を取得
-        return 40f;
+       float totalTime = 0f;
+
+    if (actionUITexts == null) return 0f;
+
+    foreach (var actionText in actionUITexts)
+    {
+        if (actionText == null) continue;
+        string action = actionText.text;
+
+        switch (action)
+        {
+            case "火入れ":
+                totalTime += 10f;
+                break;
+            case "カット":
+                totalTime += 2f;
+                break;
+            case "盛り付け":
+                totalTime += 5f;
+                break;
+            case "野菜洗い":
+                totalTime += 3f;
+                break;
+            default:
+                break; // 未設定や空文字は加算しない
+        }
     }
+
+    return totalTime;
+}
 
     public int GetSelectedSteps()
     {

@@ -37,11 +37,11 @@ public class Dish
         score += Ingredients.Count * 5;
 
         // 調理工程に応じて加点（例: 1工程につき2点）
-        score += Steps * 2;
+        score += Steps * 3;
 
         // 調理時間による加点（短いほど加点）
-        if (CookTime < 10f) score += 5;
-        else if (CookTime < 20f) score += 3;
+        if (CookTime < 45f) score += 10;
+        else if (CookTime > 45f) score -= 3;
 
         return score;
     }
