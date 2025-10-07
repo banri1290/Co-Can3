@@ -1,52 +1,30 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Events;
-using UnityEngine.UI;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-public class ChobinSetting : MonoBehaviour
+public class ChobinSetting : GameSystem
 {
-    enum SpriteSizeOption
-    {
-        NonKeepAspect, // ƒAƒXƒyƒNƒg”ä‚ğˆÛ‚µ‚È‚¢
-        KeepAspectWithCurrentWidth, // Œ»İ‚Ì•‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
-        KeepAspectWithCurrentHeight, // Œ»İ‚Ì‚‚³‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
-    }
-
-    public class ShowCommandEvent : UnityEvent<int> { }
-
-    [Header("ƒ`ƒ‡ƒrƒ“‚Ìİ’è")]
+    [Header("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®èœ¿ã‚‰ï¿½")]
+    [Tooltip("ç¹§ï½²ç¹ï½¼ç¹ç¸ºï½«é€‹ï½»è£ï½´ç¸ºå¶ï½‹ç¸ºå¶âˆ‹ç¸ºï½¦ç¸ºï½®ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®ç¹ï½ªç¹§ï½¹ç¹")]
     [SerializeField] private ChobinBehaviour[] chobins;
-    [SerializeField] private Transform WaitingSpot; // ‘Ò‹@êŠ
-    [SerializeField] private Transform ServingSpot; // —¿—‚ğ’ñ‹Ÿ‚·‚éêŠ
-    [SerializeField] private float chobinSpeed; // ƒ`ƒ‡ƒrƒ“‚ÌˆÚ“®‘¬“x
-    [SerializeField] private float chobinAcceleration; // ƒ`ƒ‡ƒrƒ“‚Ì‰Á‘¬“x
-    [SerializeField] private float performingTimeLength = 2f; // ’²—‚É‚©‚©‚éŠÔ
-    [SerializeField] private float waitingSpotRadius = 1f; // ‘Ò‹@êŠ‚Ì”¼Œa
-    [SerializeField] private Slider performingTimeSlider;
+    [Header("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®é™¦æ‚Ÿè™šè£ï½´è¬‡")]
+    [Tooltip("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºæ¢§æ¬ é‰ï½ºç¹§è²ï½¾ï¿½â–½è£ï½´è¬‡")]
+    [SerializeField] private Transform WaitingSpot;
+    [Tooltip("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºæ¢§ä¾­é€…ï¿½ï½’è¬ è‰ï½¾å¸™â˜†ç¹§å¥ï½´è¬‡")]
+    [SerializeField] private Transform ServingSpot;
 
-    [Header("ƒ`ƒ‡ƒrƒ“‚ğ‘I‘ğ‚·‚éƒ{ƒ^ƒ“‚Æ•\¦‚·‚éCanvas‚ğD&D")]
-    [SerializeField] private GameObject chobinButtonCanvas; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ğ•\¦‚·‚éCanvas
-    [SerializeField] private GameObject chobinButtonPrefab; // ƒ`ƒ‡ƒrƒ“‚ÌUIƒvƒŒƒnƒu
-    [SerializeField] private Sprite chobinButtonSprite; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒXƒvƒ‰ƒCƒg
-    [SerializeField] private string chobinButtonPrefabName = "ChobinButton"; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚Ì–¼‘O
-    [SerializeField] private Vector3 chobinButtonOffset; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌˆÊ’u
-    [SerializeField] private Vector2 chobinButtonSize; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒTƒCƒY
-    [SerializeField] private SpriteSizeOption chobinButtonSizeOption = SpriteSizeOption.NonKeepAspect; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒTƒCƒYƒIƒvƒVƒ‡ƒ“
-    [SerializeField] private bool buttonIsActiveInEditor = true; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ğ•\¦‚·‚é‚©‚Ç‚¤‚©
-
-    private UnityEvent checkAllSettings = new();
-    private ShowCommandEvent showCommandEvent = new();
+    [Header("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®ç¹ä»£Î›ç¹ï½¡ç¹ï½¼ç¹§ï½¿")]
+    [Tooltip("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®é˜ï½»èœæš®æº·ï½ºï½¦")]
+    [SerializeField] private float chobinSpeed;
+    [Tooltip("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºï½®èœ‰é¨¾æº·ï½ºï½¦")]
+    [SerializeField] private float chobinAcceleration;
+    [Tooltip("ç¹âˆšÎ™ç¹è–™Î¦ç¸ºæ‚Ÿæ¨éš±ï½¿é€…ï¿½ï½½æ‡ˆï½¥ï½­ç¸ºï½«ç¸ºä¹ï¿ ç¹§åŒºå‡¾é«¢é›£ï½¼è‚²ï½§æŠµï½¼")]
+    [SerializeField] private float performingTimeLength = 2f;
+    [Tooltip("è •ï¿½ï½©æº·ï½´è¬‡ç¸ºï½«è›»ï½°é©•æ–ï¼ ç¸ºæº˜â†’è›»ï½¤è³å£¹ï¼†ç¹§å¾Œï½‹èœŠé›ï½¾")]
+    [SerializeField] private float waitingSpotRadius = 1f;
 
     private bool AllSettingAreCorrect = true;
     private int commandCount = 1;
-
     public ChobinBehaviour[] Chobins => chobins;
-
-    public UnityEvent CheckAllSettings => checkAllSettings;
-    public ShowCommandEvent ShowCommand => showCommandEvent;
 
     // Start is called before the first frame update
     void Start()
@@ -57,18 +35,18 @@ public class ChobinSetting : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // performingTimeLength‚Ì’l‚É‰‚¶‚ÄSlider‚ğXV
+        // performingTimeLengthã®å€¤ã«å¿œã˜ã¦Sliderã‚’æ›´æ–°
         if (performingTimeSlider != null)
         {
-            // —á: performingTimeLength‚ªÅ‘å’lA0‚ªÅ¬’l
+            // ä¾‹: performingTimeLengthãŒæœ€å¤§å€¤ã€0ãŒæœ€å°å€¤
             performingTimeSlider.maxValue = performingTimeLength;
-            // performingTimeLength‚Ìis“x‚ğ•\¦i‚±‚±‚Å‚Í‰¼‚ÉŒ¸­‚µ‚Ä‚¢‚­—áj
-            // ÀÛ‚ÍChobinBehaviour‚©‚çis“x‚ğæ“¾‚µ‚Ä”½‰f‚·‚é‚Ì‚ª—‘z
+            // performingTimeLengthã®é€²è¡Œåº¦ã‚’è¡¨ç¤ºï¼ˆã“ã“ã§ã¯ä»®ã«æ¸›å°‘ã—ã¦ã„ãä¾‹ï¼‰
+            // å®Ÿéš›ã¯ChobinBehaviourã‹ã‚‰é€²è¡Œåº¦ã‚’å–å¾—ã—ã¦åæ˜ ã™ã‚‹ã®ãŒç†æƒ³
             performingTimeSlider.value = Mathf.Clamp(performingTimeLength, 0, performingTimeSlider.maxValue);
         }
     }
 
-    public bool CheckSettings()
+    public override bool CheckSettings()
     {
         AllSettingAreCorrect = true;
 
@@ -79,46 +57,30 @@ public class ChobinSetting : MonoBehaviour
                 if (chobins[i] == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour‚Ì”z—ñ‚Énull‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·BChobin {i} ‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B");
+                    Debug.LogError($"ChobinBehaviourç¸ºï½®é©Ÿæ¦Šï¿½ç¸ºï½«nullç¸ºæ‚Ÿæ€§ç¸ºï½¾ç¹§å¾Œâ€»ç¸ºï¿½âˆªç¸ºå¶ï¿½hobin {i} ç¹§å®šï½¨ï½­è³å£¹ï¼ ç¸ºï½¦ç¸ºä¸Šâ–¡ç¸ºè¼”ï¼ç¸²");
                 }
                 else if (chobins[i].GetComponent<NavMeshAgent>() == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour‚ÌNavMeshAgent‚ªChobin {i} ‚Éİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñBNavMeshAgent‚ğ’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B");
+                    Debug.LogError($"ChobinBehaviourç¸ºï½«NavMeshAgentç¸ºé´hobin {i} ç¸ºï½«éšªï½­è³å£¹ï¼†ç¹§å¾Œâ€»ç¸ºï¿½âˆªç¸ºå¸™ï½“ç¸²ï¿½avMeshAgentç¹§å®šï½¿ï½½èœ‰ç¸ºåŠ±â€»ç¸ºä¸Šâ–¡ç¸ºè¼”ï¼ç¸²");
                 }
             }
         }
         else
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("ChobinBehaviour‚Ì”z—ñ‚ª‹ó‚Å‚·BChobinBehaviour‚ğƒAƒ^ƒbƒ`‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError("ChobinBehaviourç¸ºï½®é©Ÿæ¦Šï¿½ç¸ºæªï½©ï½ºç¸ºï½§ç¸ºå¶ï¿½hobinBehaviourç¹§åµã„ç¹§ï½¿ç¹ï¿½ãƒ¡ç¸ºåŠ±â€»ç¸ºä¸Šâ–¡ç¸ºè¼”ï¼ç¸²");
         }
 
         if (WaitingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("‘Ò‹@êŠ‚ÌTransform‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("è •ï¿½ï½©æº·ï½´è¬‡ç¸ºï½®Transformç¸ºç‘šï½¨ï½­è³å£¹ï¼†ç¹§å¾Œâ€»ç¸ºï¿½âˆªç¸ºå¸™ï½“ç¸²");
         }
         if (ServingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("—¿—‚ğ’ñ‹Ÿ‚·‚éêŠ‚ÌTransform‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-
-        if (chobinButtonCanvas == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚ÌCanvasƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        if (chobinButtonPrefab == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚Ìƒ{ƒ^ƒ“ƒvƒŒƒnƒu‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        else if (chobinButtonPrefab.GetComponent<Button>() == null || chobinButtonPrefab.GetComponent<Image>() == null || chobinButtonPrefab.GetComponent<RectTransform>() == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚Ìƒ{ƒ^ƒ“ƒvƒŒƒnƒu‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("è­å’ç‚Šç¹§å‘ˆç½²è“å¸™ã€’ç¸ºé˜ªï½‹è£ï½´è¬‡ç¸ºï½®Transformç¸ºç‘šï½¨ï½­è³å£¹ï¼†ç¹§å¾Œâ€»ç¸ºï¿½âˆªç¸ºå¸™ï½“ç¸²");
         }
 
         return AllSettingAreCorrect;
@@ -126,80 +88,8 @@ public class ChobinSetting : MonoBehaviour
 
     public void Init()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying)
-        {
-            InitChobinButtonParent();
-        }
-        else
-        {
-            bool changeChobinCount = (chobinButtonCanvas.transform.childCount != chobins.Length);
-            if (changeChobinCount)
-            {
-                Debug.Log("ƒ`ƒ‡ƒrƒ“‚Ì”‚ª•ÏX‚³‚ê‚½‚½‚ßAƒ`ƒ‡ƒrƒ“‘I‘ğƒ{ƒ^ƒ“‚ğÄ‰Šú‰»‚µ‚Ü‚·B");
-                EditorApplication.delayCall += InitChobinButtonParent; // ƒ`ƒ‡ƒrƒ“‘I‘ğƒ{ƒ^ƒ“‚ÌeƒIƒuƒWƒFƒNƒg‚ğ‰Šú‰»
-            }
-            else
-            {
-                InitChobins(); // ƒ`ƒ‡ƒrƒ“‚Ìƒpƒ‰ƒ[ƒ^‚ğXV
-            }
-        }
-#else
-        InitChobinButtonParent();
-#endif
-
-        Debug.Log("ChobinSetting‚Ì‰Šú‰»‚ªŠ®—¹‚µ‚Ü‚µ‚½B");
-    }
-
-
-
-    private void InitChobinButtonParent()
-    {
-        // Šù‘¶‚ÌUIƒIƒuƒWƒFƒNƒg‚ğíœ
-        while (chobinButtonCanvas.transform.childCount > 0)
-        {
-            DestroyImmediate(chobinButtonCanvas.transform.GetChild(0).gameObject);
-        }
         for (int i = 0; i < chobins.Length; i++)
         {
-            GameObject chobinButtonObject = null;
-#if UNITY_EDITOR
-            chobinButtonObject = UnityEditor.PrefabUtility.InstantiatePrefab(chobinButtonPrefab, chobinButtonCanvas.transform) as GameObject;
-#else
-            chobinButtonObject = Instantiate(chobinButtonPrefab, chobinButtonCanvas.transform);
-#endif
-            chobinButtonObject.name = chobinButtonPrefabName + "_" + i; // ƒ`ƒ‡ƒrƒ“ƒ{ƒ^ƒ“‚Ì–¼‘O‚ğİ’è
-        }
-
-        InitChobins();
-#if UNITY_EDITOR
-        EditorApplication.delayCall -= InitChobinButtonParent; // ˆê“x‚¾‚¯Às‚·‚é‚½‚ß‚É‰ğœ
-#endif
-    }
-
-    private void InitChobins()
-    {
-        chobinButtonSize = SpriteSize(chobinButtonSprite, chobinButtonSize, chobinButtonSizeOption);
-
-        for (int i = 0; i < chobins.Length; i++)
-        {
-            // UI‚ÌˆÊ’u‚ğİ’è
-            GameObject chobinButtonObject = chobinButtonCanvas.transform.GetChild(i).gameObject;
-            Button chobinButton = chobinButtonObject.GetComponent<Button>();
-            RectTransform chobinButtonRect = chobinButtonObject.GetComponent<RectTransform>();
-            chobinButtonRect.sizeDelta = chobinButtonSize;
-            Image chobinImage = chobinButtonObject.GetComponent<Image>();
-            if (chobinImage != null)
-            {
-                chobinImage.sprite = chobinButtonSprite;
-            }
-            if (chobinButton != null)
-            {
-                int chobinIndex = i; // ƒ[ƒJƒ‹•Ï”‚ğg—p‚µ‚ÄƒNƒ[ƒWƒƒ[‚Ì–â‘è‚ğ‰ñ”ğ
-                chobinButton.onClick.RemoveAllListeners();
-                chobinButton.onClick.AddListener(() => showCommandEvent.Invoke(chobinIndex));
-            }
-
             if (chobins[i] != null)
             {
                 NavMeshAgent agent = chobins[i].GetComponent<NavMeshAgent>();
@@ -210,64 +100,14 @@ public class ChobinSetting : MonoBehaviour
                 }
                 chobins[i].SetWaitingSpot(WaitingSpot, waitingSpotRadius);
                 chobins[i].SetServingSpot(ServingSpot);
-                chobins[i].SetSelectButton(chobinButtonObject, chobinButtonOffset);
                 chobins[i].SetPerformingTimeLength(performingTimeLength);
                 chobins[i].Init(i, commandCount);
             }
-
-#if UNITY_EDITOR
-            if (EditorApplication.isPlaying)
-            {
-                chobinButtonObject.SetActive(false);
-            }
-            else
-            {
-                chobinButtonObject.SetActive(buttonIsActiveInEditor);
-            }
-#else
-            chobinButtonObject.SetActive(false);
-#endif
         }
-    }
-
-    private Vector2 SpriteSize(Sprite sprite, Vector2 targetSize, SpriteSizeOption spriteSizeOption)
-    {
-        Vector2 newSize = targetSize;
-        switch (spriteSizeOption)
-        {
-            case SpriteSizeOption.NonKeepAspect:
-                // ‚»‚Ì‚Ü‚Ü
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentWidth:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.height / sprite.rect.width;
-                    newSize.y = newSize.x * aspectRatio;
-                }
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentHeight:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.width / sprite.rect.height;
-                    newSize.x = newSize.y * aspectRatio;
-                }
-                break;
-        }
-        return newSize;
     }
 
     public void SetCommandCount(int _commandCount)
     {
         commandCount = _commandCount;
     }
-
-    /// <summary>
-    /// ƒGƒfƒBƒ^ã‚Åƒpƒ‰ƒ[ƒ^‚ª•ÏX‚³‚ê‚½‚Æ‚«‚Éİ’è‚ğƒ`ƒFƒbƒN‚µ‚Ä‰Šú‰»‚ğs‚¤
-    /// </summary>
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        checkAllSettings.Invoke();
-    }
-#endif
 }

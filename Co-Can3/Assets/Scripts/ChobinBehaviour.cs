@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
-using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class ChobinBehaviour : MonoBehaviour
 {
@@ -14,20 +16,32 @@ public class ChobinBehaviour : MonoBehaviour
         BackToWaitingSpot = 4
     }
 
+    [Header("コンポーネント参照")]
+    [Tooltip("移動に使用するNavMeshAgent")]
     [SerializeField] private NavMeshAgent navAgent;
+    [Tooltip("このチョビンを選択するためのボタンオブジェクト")]
     [SerializeField] private GameObject selectButton;
+
+    [Header("行動設定")]
+    [Tooltip("待機場所のTransform")]
     [SerializeField] private Transform waitingSpot;
+    [Tooltip("料理を提供する場所のTransform")]
     [SerializeField] private Transform servingSpot;
+    [Tooltip("チョビンの頭上に表示される選択ボタンのオフセット")]
     [SerializeField] private Vector3 selectButtonOffset = new Vector3(0f, 2f, 0f);
+    [Tooltip("調理作業にかかる時間")]
     [SerializeField] private float performingTimeLength = 2f;
+    [Tooltip("待機場所に到着したとみなす半径")]
     [SerializeField] private float waitingSpotRadius = 1f;
     [SerializeField] private Slider performingTimeSlider;
 
     private UnityEvent serveEvent = new();
 
     private Transform[] target;
-    private int[] MaterialIndex;
-    private int[] ActionIndex;
+    private int[] materialIndex;
+    private int[] actionIndex;
+    private Transform cameraObj;
+    private RectTransform buttonRect;
     private int id;
     private int currentIndex;
     private Status status;
@@ -35,13 +49,14 @@ public class ChobinBehaviour : MonoBehaviour
     private bool hasGuestWaitingForOrderFlag;
 
     public GameObject SelectButton => selectButton;
-    public int[] materialIndex => MaterialIndex;
-    public int[] actionIndex => ActionIndex;
+    public int[] MaterialIndex => materialIndex;
+    public int[] ActionIndex => actionIndex;
     public int ID => id;
 
     // Start is called before the first frame update
     void Start()
     {
+        cameraObj = Camera.main.transform;
         currentIndex = 0;
         performingTime = 0f;
         hasGuestWaitingForOrderFlag = false;
@@ -84,8 +99,8 @@ public class ChobinBehaviour : MonoBehaviour
     {
         id = _id;
         target = new Transform[count];
-        MaterialIndex = new int[count];
-        ActionIndex = new int[count];
+        materialIndex = new int[count];
+        actionIndex = new int[count];
         SetState(Status.CommandWaitiating);
         CommandWaiting();
         for (int i = 0; i < count; i++)
@@ -95,7 +110,7 @@ public class ChobinBehaviour : MonoBehaviour
             ActionIndex[i] = 0;
 
             SetMaterial(i, 0);
-            SetAction(i, 0, target[0]);
+            SetAction(i, 0);
         }
     }
 
@@ -113,6 +128,7 @@ public class ChobinBehaviour : MonoBehaviour
     public void SetSelectButton(GameObject _selectButton, Vector3 _selectButtonOffset)
     {
         selectButton = _selectButton;
+        buttonRect = selectButton.GetComponent<RectTransform>();
         selectButtonOffset = _selectButtonOffset;
     }
 
@@ -173,23 +189,29 @@ public class ChobinBehaviour : MonoBehaviour
         MaterialIndex[index] = material;
     }
 
-    public void SetAction(int index, int action, Transform tar)
+    public void SetAction(int index, int action)
     {
         ActionIndex[index] = action;
-        target[index] = tar;
     }
 
     public void SetHasGuestFlag(bool flag)
     {
         hasGuestWaitingForOrderFlag = flag;
-        selectButton.SetActive(flag && status==Status.CommandWaitiating);
+        selectButton.SetActive(flag && status == Status.CommandWaitiating);
     }
 
-    public void SetCommand(UnityEvent _serveEvent)
+    public void SetCommand(UnityAction action, Transform[] _target)
     {
-        serveEvent = _serveEvent;
+        serveEvent.RemoveAllListeners();
+        serveEvent.AddListener(action);
+        target = _target;
         currentIndex = 0;
         SetState(Status.Moving);
+    }
+
+    public void SetButtonDirection(float angle)
+    {
+        buttonRect.rotation = Quaternion.Euler(0, angle, 0);
     }
 
     void SetState(Status s)
@@ -198,8 +220,17 @@ public class ChobinBehaviour : MonoBehaviour
         switch (status)
         {
             case Status.CommandWaitiating:
+#if UNITY_EDITOR
+                if (EditorApplication.isPlaying)
+                {
+                    selectButton.SetActive(hasGuestWaitingForOrderFlag);
+                    navAgent.SetDestination(transform.position);
+                }
+
+#else
                 navAgent.SetDestination(transform.position);
                 selectButton.SetActive(hasGuestWaitingForOrderFlag);
+#endif
                 break;
             case Status.Moving:
                 navAgent.SetDestination(target[currentIndex].position);
