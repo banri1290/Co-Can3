@@ -5,32 +5,40 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// ã‚²ãƒ¼ãƒ å…¨ä½“ã®é€²è¡Œã€ä¸»è¦ãªã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆé–“ã®é€£æºã€
+/// ãŠã‚ˆã³èµ·å‹•æ™‚ã®åˆæœŸè¨­å®šã®ãƒã‚§ãƒƒã‚¯ã‚’ç®¡ç†ã™ã‚‹ã‚³ã‚¢ã‚¹ã‚¯ãƒªãƒ—ãƒˆã§ã™ã€‚
+/// </summary>
 public class GameManager : MonoBehaviour
 {
-    [System.Serializable]
-    public struct Material
-    {
-        [SerializeField] private string name; // HŞ‚Ì–¼‘O
-        public string Name => name; // HŞ‚Ì–¼‘O‚ğæ“¾
-    }
-    [System.Serializable]
-    public struct Action
-    {
-        [SerializeField] private string name; // ’²—–@‚Ì–¼‘O
-        [SerializeField] private Transform kitchinSpot; // ’²—ê‚ÌˆÊ’u
+    // --- ãƒã‚¹ã‚¿ãƒ¼ãƒ‡ãƒ¼ã‚¿è¨­å®š ---
+    [Header("Master Data Settings")]
+    [Tooltip("èª¿ç†ã«ä½¿ã†ã™ã¹ã¦ã®ææ–™ï¼ˆMaterialï¼‰ã®ãƒªã‚¹ãƒˆã€‚ãƒ¡ãƒ‹ãƒ¥ãƒ¼ç”»é¢ã§ã®é¸æŠè‚¢ã¨ã—ã¦ä½¿ã‚ã‚Œã¾ã™ã€‚")]
+    [SerializeField] private Material[] materials;
 
-        public string Name => name; // ’²—–@‚Ì–¼‘O‚ğæ“¾
-        public Transform KitchinSpot => kitchinSpot; //’²—ê‚ÌˆÊ’u‚ğæ“¾
-    }
-    [SerializeField] private Material[] materials; // HŞ‚Ì”z—ñ
-    [SerializeField] private Action[] actions; // ’²—–@‚Ì”z—ñ
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ˆChobinï¼‰ãŒå®Ÿè¡Œã§ãã‚‹ã™ã¹ã¦ã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ï¼ˆActionï¼‰ã®ãƒªã‚¹ãƒˆã€‚")]
+    [SerializeField] private Action[] actions;
 
-    [Header("w¦UI‚ğ§Œä‚·‚éƒIƒuƒWƒFƒNƒg")]
-    [SerializeField] private CookingCommandBehaviour cookingCommandBehaviour; // w¦UI‚ğ§Œä‚·‚éƒIƒuƒWƒFƒNƒg
-    [Header("ƒ`ƒ‡ƒrƒ“‚Ìİ’è‚ğˆêŠ‡‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg")]
-    [SerializeField] private ChobinSetting chobinSetting; // ƒ`ƒ‡ƒrƒ“‚Ìİ’è‚ğˆêŠ‡‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg
-    [Header("‹q‚ğŒÄ‚Ño‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg")]
-    [SerializeField] private GuestCtrl guestCtrl; // ‹q‚ğŒÄ‚Ño‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg
+    // --- ä¸»è¦ãªåˆ¶å¾¡ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ ---
+    [Header("UI & Command Control")]
+    [Tooltip("UIã‹ã‚‰èª¿ç†ã‚³ãƒãƒ³ãƒ‰ã‚’å—ã‘ä»˜ã‘ã€è¡¨ç¤ºã‚’ç®¡ç†ã™ã‚‹ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢ã€‚")]
+    [SerializeField] private CookingCommandBehaviour cookingCommandBehaviour;
+
+    [Header("Chobin Buttons Control")]
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ˆChobinï¼‰ã®é¸æŠã¨ã‚³ãƒãƒ³ãƒ‰å…¥åŠ›ã‚’ç®¡ç†ã™ã‚‹UIã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚")]
+    [SerializeField] private ChobinButtonsCtrl chobinButtonsCtrl;
+
+    [Header("Guest & Order Management")]
+    [Tooltip("ã‚²ã‚¹ãƒˆï¼ˆå®¢ï¼‰ã®ç™ºç”Ÿã€æ³¨æ–‡ã€æ–™ç†ã®æä¾›ã‚’åˆ¶å¾¡ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚")]
+    [SerializeField] private GuestCtrl guestCtrl;
+    [Header("Camera Settings")]
+    [Tooltip("ã‚²ãƒ¼ãƒ å†…ã®ã‚«ãƒ¡ãƒ©åˆ¶å¾¡ã‚’æ‹…å½“ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚")]
+    [SerializeField] private RoundCamera roundCamera;
+    [Header("Score Calclating")]
+    [Tooltip("æ–™ç†ã®ã‚¹ã‚³ã‚¢è¨ˆç®—ã‚’æ‹…å½“ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚")]
+    [SerializeField] private CookingScoreCalclater cookingScoreCalclater;
+
+    private ChobinSetting chobinSetting;
 
     // Start is called before the first frame update
     void Start()
@@ -46,17 +54,18 @@ public class GameManager : MonoBehaviour
 
     private void CheckSettings()
     {
-        bool AllSettingsAreCorrect = true;
+        // å„ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æ¤œè¨¼çµæœã‚’ãƒªã‚¹ãƒˆã«é›†ç´„
+        var validationResults = new System.Collections.Generic.List<bool>();
 
         if (materials.Length == 0)
         {
-            AllSettingsAreCorrect = false;
-            Debug.LogError("HŞƒŠƒXƒg‚ª‹ó‚Å‚·B­‚È‚­‚Æ‚à1‚Â‚ÌHŞ‚ğ’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError("ææ–™ã®ãƒªã‚¹ãƒˆãŒç©ºã§ã™ã€‚å°‘ãªãã¨ã‚‚1ã¤ã®èª¿ç†æ³•ã‚’è¿½åŠ ã—ã¦ãã ã•ã„ã€‚");
+            validationResults.Add(false);
         }
         if (actions.Length == 0)
         {
-            AllSettingsAreCorrect = false;
-            Debug.LogError("’²—–@ƒŠƒXƒg‚ª‹ó‚Å‚·B­‚È‚­‚Æ‚à1‚Â‚Ì’²—–@‚ğ’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError("èª¿ç†æ³•ãƒªã‚¹ãƒˆãŒç©ºã§ã™ã€‚å°‘ãªãã¨ã‚‚1ã¤ã®èª¿ç†æ³•ã‚’è¿½åŠ ã—ã¦ãã ã•ã„ã€‚");
+            validationResults.Add(false);
         }
         else
         {
@@ -64,70 +73,54 @@ public class GameManager : MonoBehaviour
             {
                 if (actions[i].KitchinSpot == null)
                 {
-                    AllSettingsAreCorrect = false;
-                    Debug.LogError($"’²—–@ {actions[i].Name} ‚É’²—ê‚ÌTransform‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+                    Debug.LogError($"èª¿ç†æ³• {actions[i].Name} ã«èª¿ç†ã™ã‚‹TransformãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
+                    validationResults.Add(false);
                 }
             }
         }
 
-        if (cookingCommandBehaviour == null)
-        {
-            AllSettingsAreCorrect = false;
-            Debug.LogError("w¦UI‚ğ§Œä‚·‚éƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        else
-        {
-            cookingCommandBehaviour.CheckAllSettings.RemoveAllListeners();
-            cookingCommandBehaviour.CheckAllSettings.AddListener(CheckSettingOnValidate);
+        // å„ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®æ¤œè¨¼ã‚’ãƒ˜ãƒ«ãƒ‘ãƒ¼ãƒ¡ã‚½ãƒƒãƒ‰ã§è¡Œã†
+        validationResults.Add(ValidateComponent(cookingCommandBehaviour, "æŒ‡ç¤ºUIã‚’ç®¡ç†ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ"));
+        validationResults.Add(ValidateComponent(chobinButtonsCtrl, "ãƒãƒ§ãƒ“ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ"));
+        validationResults.Add(ValidateComponent(guestCtrl, "å®¢ã‚’å‡ºç¾ã•ã›ã¦ç®¡ç†ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ"));
+        validationResults.Add(ValidateComponent(roundCamera, "CameraCtrlã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ"));
+        validationResults.Add(ValidateComponent(cookingScoreCalclater, "CookingScoreCalclaterã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ"));
 
-            bool cookingCommandBehaviourSettingsAreCorrect = cookingCommandBehaviour.CheckSettings();
-            if (!cookingCommandBehaviourSettingsAreCorrect)
-            {
-                AllSettingsAreCorrect = false;
-                Debug.LogError("w¦UI‚ğ§Œä‚·‚éƒIƒuƒWƒFƒNƒg‚Ìİ’è‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·B");
-            }
+        // ChobinSettingã¯ChobinButtonsCtrlã«ä¾å­˜ã—ã¦ã„ã‚‹ãŸã‚ã€å€‹åˆ¥ã§å‡¦ç†
+        if (chobinButtonsCtrl != null && chobinButtonsCtrl.ChobinSetting != null)
+        {
+            chobinSetting = chobinButtonsCtrl.ChobinSetting;
+            validationResults.Add(ValidateComponent(chobinSetting, "ãƒãƒ§ãƒ“ãƒ³ã®è¨­å®š"));
         }
 
-        if (chobinSetting == null)
-        {
-            AllSettingsAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‚Ìİ’è‚ğˆêŠ‡‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        else
-        {
-            chobinSetting.CheckAllSettings.RemoveAllListeners();
-            chobinSetting.CheckAllSettings.AddListener(CheckSettingOnValidate);
-
-            bool chobinSettingSettingsAreCorrect = chobinSetting.CheckSettings();
-            if (!chobinSettingSettingsAreCorrect)
-            {
-                AllSettingsAreCorrect = false;
-                Debug.LogError("ƒ`ƒ‡ƒrƒ“‚Ìİ’è‚ğˆêŠ‡‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg‚Ìİ’è‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·B");
-            }
-        }
-
-        if (guestCtrl == null)
-        {
-            AllSettingsAreCorrect = false;
-            Debug.LogError("‹q‚ğŒÄ‚Ño‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        else
-        {
-            guestCtrl.CheckAllSettings.RemoveAllListeners();
-            guestCtrl.CheckAllSettings.AddListener(CheckSettingOnValidate);
-
-            bool guestCtrlSettingsAreCorrect = guestCtrl.CheckSetings();
-            if (!guestCtrlSettingsAreCorrect)
-            {
-                AllSettingsAreCorrect = false;
-                Debug.LogError("‹q‚ğŒÄ‚Ño‚µ‚ÄŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg‚Ìİ’è‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·B");
-            }
-        }
-
-        if (AllSettingsAreCorrect)
+        // å…¨ã¦ã®æ¤œè¨¼ãŒé€šã£ãŸã‹ãƒã‚§ãƒƒã‚¯
+        if (validationResults.TrueForAll(result => result))
         {
             Init();
         }
+    }
+
+    /// <summary>
+    /// GameSystemã‚’ç¶™æ‰¿ã—ãŸã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®nullãƒã‚§ãƒƒã‚¯ã¨è¨­å®šæ¤œè¨¼ã‚’è¡Œã†ãƒ˜ãƒ«ãƒ‘ãƒ¼ãƒ¡ã‚½ãƒƒãƒ‰ã€‚
+    /// </summary>
+    private bool ValidateComponent(GameSystem component, string componentName)
+    {
+        if (component == null)
+        {
+            Debug.LogError($"{componentName}ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
+            return false;
+        }
+
+        component.CheckAllSettings.RemoveAllListeners();
+        component.CheckAllSettings.AddListener(CheckSettingOnValidate);
+
+        if (!component.CheckSettings())
+        {
+            Debug.LogError($"{componentName}ã®è¨­å®šã«ä¸å‚™ãŒã‚ã‚Šã¾ã™ã€‚");
+            return false;
+        }
+
+        return true;
     }
 
     private void Init()
@@ -135,12 +128,15 @@ public class GameManager : MonoBehaviour
         InitCookingCommand();
         InitChobinSetting();
         InitGuestCtrl();
+        InitRoundCamera();
+        cookingScoreCalclater.Init();
 
-        Debug.Log("GameManager‚Ì‰Šú‰»‚ª³í‚ÉŠ®—¹‚µ‚Ü‚µ‚½B");
+        Debug.Log("GameManagerã®åˆæœŸåŒ–ãŒæ­£å¸¸ã«å®Œäº†ã—ã¾ã—ãŸã€‚");
     }
 
     private void InitCookingCommand()
     {
+        // ã‚¤ãƒ™ãƒ³ãƒˆãƒªã‚¹ãƒŠãƒ¼ã‚’ä¸€åº¦ã‚¯ãƒªã‚¢ã—ã¦ã‹ã‚‰å†ç™»éŒ²
         cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.NextMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
@@ -156,27 +152,48 @@ public class GameManager : MonoBehaviour
 
     private void InitChobinSetting()
     {
+        // CookingCommandBehaviourã‹ã‚‰æ­£ã—ã„æŒ‡ç¤ºæ•°ã‚’å–å¾—ã—ã¦ChobinSettingã«è¨­å®š
         chobinSetting.SetCommandCount(cookingCommandBehaviour.CommandCount);
-        chobinSetting.ShowCommand.RemoveAllListeners();
-        chobinSetting.ShowCommand.AddListener(ShowCommand);
-        chobinSetting.Init();
+
+        chobinButtonsCtrl.ShowCommand.RemoveAllListeners();
+        chobinButtonsCtrl.ShowCommand.AddListener(ShowCommand);
+        chobinButtonsCtrl.Init();
     }
 
     private void InitGuestCtrl()
     {
         guestCtrl.HasGuestWaitingForOrder.RemoveAllListeners();
         guestCtrl.LeftGuestWaitingForOrder.RemoveAllListeners();
-        guestCtrl.HasGuestWaitingForOrder.AddListener(()=> InformGuestWaitingForOrder(true));
+        guestCtrl.HasGuestWaitingForOrder.AddListener(() => InformGuestWaitingForOrder(true));
         guestCtrl.LeftGuestWaitingForOrder.AddListener(() => InformGuestWaitingForOrder(false));
         guestCtrl.Init();
     }
 
+    private void InitRoundCamera()
+    {
+        void setButtonDirection(float angle)
+        {
+            for (int i = 0; i < chobinSetting.Chobins.Length; i++)
+            {
+                chobinSetting.Chobins[i].SetButtonDirection(angle);
+            }
+        }
+
+        roundCamera.ChangeRotate.RemoveAllListeners();
+        roundCamera.ChangeRotate.AddListener((v) => setButtonDirection(v));
+        roundCamera.Init();
+    }
+
     private void InitCommandTexts(int chobinIndex)
     {
+        ChobinBehaviour chobin = GetChobin(chobinIndex);
         for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
         {
-            SetMaterial(chobinIndex, i, 0); // Šeƒ`ƒ‡ƒrƒ“‚ÌŠew¦‚ÌHŞ‚ğ‰Šú‰»iÅ‰‚ÌHŞ‚Éİ’èj
-            SetAction(chobinIndex, i, 0); // Šeƒ`ƒ‡ƒrƒ“‚ÌŠew¦‚Ì’²—–@‚ğ‰Šú‰»iÅ‰‚Ì’²—–@‚Éİ’èj
+            // ãƒãƒ§ãƒ“ãƒ³ãŒç¾åœ¨è¨˜æ†¶ã—ã¦ã„ã‚‹ææ–™ã¨èª¿ç†æ³•ã‚’UIã«åæ˜ ã•ã›ã‚‹
+            int materialIndex = chobin.MaterialIndex[i];
+            int actionIndex = chobin.ActionIndex[i];
+            cookingCommandBehaviour.UpdateMaterial(i, materials[materialIndex]);
+            cookingCommandBehaviour.UpdateAction(i, actions[actionIndex]);
         }
     }
 
@@ -187,25 +204,25 @@ public class GameManager : MonoBehaviour
 
     private void SetPreviousMaterial(int currentChobinUIIndex, int commandIndex)
     {
-        int materialIndex = (GetChobin(currentChobinUIIndex).materialIndex[commandIndex] - 1 + materials.Length) % materials.Length;
+        int materialIndex = (GetChobin(currentChobinUIIndex).MaterialIndex[commandIndex] - 1 + materials.Length) % materials.Length;
         SetMaterial(currentChobinUIIndex, commandIndex, materialIndex);
     }
 
     private void SetNextMaterial(int currentChobinUIIndex, int commandIndex)
     {
-        int materialIndex = (GetChobin(currentChobinUIIndex).materialIndex[commandIndex] + 1) % materials.Length;
+        int materialIndex = (GetChobin(currentChobinUIIndex).MaterialIndex[commandIndex] + 1) % materials.Length;
         SetMaterial(currentChobinUIIndex, commandIndex, materialIndex);
     }
 
     private void SetPreviousAction(int currentChobinUIIndex, int commandIndex)
     {
-        int actionIndex = (GetChobin(currentChobinUIIndex).actionIndex[commandIndex] - 1 + actions.Length) % actions.Length;
+        int actionIndex = (GetChobin(currentChobinUIIndex).ActionIndex[commandIndex] - 1 + actions.Length) % actions.Length;
         SetAction(currentChobinUIIndex, commandIndex, actionIndex);
     }
 
     private void SetNextAction(int currentChobinUIIndex, int commandIndex)
     {
-        int actionIndex = (GetChobin(currentChobinUIIndex).actionIndex[commandIndex] + 1) % actions.Length;
+        int actionIndex = (GetChobin(currentChobinUIIndex).ActionIndex[commandIndex] + 1) % actions.Length;
         SetAction(currentChobinUIIndex, commandIndex, actionIndex);
     }
 
@@ -214,22 +231,22 @@ public class GameManager : MonoBehaviour
         int commandCount = cookingCommandBehaviour.CommandCount;
         if (commandIndex < 0 || commandIndex >= commandCount)
         {
-            Debug.LogError($"w¦ƒCƒ“ƒfƒbƒNƒX {commandIndex} ‚ª”ÍˆÍŠO‚Å‚·B0‚©‚ç{commandCount - 1}‚Ì”ÍˆÍ‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError($"æŒ‡ç¤ºã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ {commandIndex} ãŒç¯„å›²å¤–ã§ã™ã€‚0ã‹ã‚‰{commandCount - 1}ã®ç¯„å›²ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
             return;
         }
         if (materialIndex < 0 || materialIndex >= materials.Length)
         {
-            Debug.LogError($"HŞƒCƒ“ƒfƒbƒNƒX {materialIndex} ‚ª”ÍˆÍŠO‚Å‚·B0‚©‚ç{materials.Length - 1}‚Ì”ÍˆÍ‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError($"ææ–™ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ {materialIndex} ãŒç¯„å›²å¤–ã§ã™ã€‚0ã‹ã‚‰{materials.Length - 1}ã®ç¯„å›²ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
             return;
         }
         GetChobin(currentChobinUIIndex).SetMaterial(commandIndex, materialIndex);
 #if UNITY_EDITOR
         if (EditorApplication.delayCall == null)
         {
-            cookingCommandBehaviour.UpdateMaterialText(commandIndex, materials[materialIndex].Name); // HŞ‚ÌƒeƒLƒXƒg‚ğXV
+            cookingCommandBehaviour.UpdateMaterial(commandIndex, materials[materialIndex]); // ææ–™ã®UIã‚’æ›´æ–°
         }
 #else
-        cookingCommandBehaviour.UpdateMaterialText(commandIndex, materials[materialIndex].Name); // HŞ‚ÌƒeƒLƒXƒg‚ğXV
+        cookingCommandBehaviour.UpdateMaterial(commandIndex, materials[materialIndex]); // ææ–™ã®UIã‚’æ›´æ–°
 #endif
     }
     private void SetAction(int currentChobinUIIndex, int commandIndex, int actionIndex)
@@ -237,23 +254,23 @@ public class GameManager : MonoBehaviour
         int commandCount = cookingCommandBehaviour.CommandCount;
         if (commandIndex < 0 || commandIndex >= commandCount)
         {
-            Debug.LogError($"w¦ƒCƒ“ƒfƒbƒNƒX {commandIndex} ‚ª”ÍˆÍŠO‚Å‚·B0‚©‚ç{commandCount - 1}‚Ì”ÍˆÍ‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError($"æŒ‡ç¤ºã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ {commandIndex} ãŒç¯„å›²å¤–ã§ã™ã€‚0ã‹ã‚‰{commandCount - 1}ã®ç¯„å›²ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
             return;
         }
         if (actionIndex < 0 || actionIndex >= actions.Length)
         {
-            Debug.LogError($"’²—–@ƒCƒ“ƒfƒbƒNƒX {actionIndex} ‚ª”ÍˆÍŠO‚Å‚·B0‚©‚ç{actions.Length - 1}‚Ì”ÍˆÍ‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError($"èª¿ç†æ³•ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ {actionIndex} ãŒç¯„å›²å¤–ã§ã™ã€‚0ã‹ã‚‰{actions.Length - 1}ã®ç¯„å›²ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
             return;
         }
-        GetChobin(currentChobinUIIndex).SetAction(commandIndex, actionIndex, actions[actionIndex].KitchinSpot);
+        GetChobin(currentChobinUIIndex).SetAction(commandIndex, actionIndex);
 
 #if UNITY_EDITOR
         if (EditorApplication.delayCall == null)
         {
-            cookingCommandBehaviour.UpdateActionText(commandIndex, actions[actionIndex].Name); // ’²—–@‚ÌƒeƒLƒXƒg‚ğXV
+            cookingCommandBehaviour.UpdateAction(commandIndex, actions[actionIndex]); // èª¿ç†æ³•ã®UIã‚’æ›´æ–°
         }
 #else
-        cookingCommandBehaviour.UpdateActionText(commandIndex, actions[actionIndex].Name); // ’²—–@‚ÌƒeƒLƒXƒg‚ğXV
+        cookingCommandBehaviour.UpdateAction(commandIndex, actions[actionIndex]); // èª¿ç†æ³•ã®UIã‚’æ›´æ–°
 #endif
     }
 
@@ -261,7 +278,7 @@ public class GameManager : MonoBehaviour
     {
         if (chobinIndex < 0 || chobinIndex >= chobinSetting.Chobins.Length)
         {
-            Debug.LogError($"ƒ`ƒ‡ƒrƒ“ƒCƒ“ƒfƒbƒNƒX {chobinIndex} ‚ª”ÍˆÍŠO‚Å‚·B0‚©‚ç{chobinSetting.Chobins.Length - 1}‚Ì”ÍˆÍ‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError($"ãƒãƒ§ãƒ“ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ {chobinIndex} ãŒç¯„å›²å¤–ã§ã™ã€‚0ã‹ã‚‰{chobinSetting.Chobins.Length - 1}ã®ç¯„å›²ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚");
             return;
         }
         cookingCommandBehaviour.SubmitCommandEvent.RemoveAllListeners();
@@ -270,11 +287,45 @@ public class GameManager : MonoBehaviour
         InitCommandTexts(chobinIndex);
     }
 
+    /// <summary>
+    /// æ–™ç†ã‚’æä¾›ã—ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
+    /// </summary>
+    /// <param name="chobinIndex">
+    /// æ–™ç†ã‚’æä¾›ã—ãŸãƒãƒ§ãƒ“ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+    /// </param>
+    private void SendServeData(int chobinIndex)
+    {
+        guestCtrl.ServeDish();
+        // æ–™ç†ã‚’å—ã‘å–ã£ãŸå®¢
+        GuestBehaviour guest = guestCtrl.GetServedGuest();
+        // æ–™ç†ã‚’æä¾›ã—ãŸãƒãƒ§ãƒ“ãƒ³
+        ChobinBehaviour chobin = GetChobin(chobinIndex);
+        // æä¾›ã—ãŸæ–™ç†ã®ææ–™ãƒ»èª¿ç†æ³•ã®IDã‚’å–å¾—
+        int[] materialIndices = new int[cookingCommandBehaviour.CommandCount];
+        int[] actionIndices = new int[cookingCommandBehaviour.CommandCount];
+        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
+        {
+            materialIndices[i] = chobin.MaterialIndex[i];
+            actionIndices[i] = chobin.ActionIndex[i];
+        }
+        // å®¢ã®å¾…ã¡æ™‚é–“ã‚’å–å¾—
+        float waitingTime = guest.WaitingTimer;
+
+        Debug.Log($"ãƒãƒ§ãƒ“ãƒ³{chobinIndex}ãŒå®¢{guest.ID}ã«æ–™ç†ã‚’æä¾›ã—ã¾ã—ãŸã€‚ææ–™ID: [{string.Join(", ", materialIndices)}]ã€èª¿ç†æ³•ID: [{string.Join(", ", actionIndices)}]ã€å¾…ã¡æ™‚é–“: {waitingTime:F2}ç§’");
+
+        // CookingScoreCalclaterã«æ–™ç†ãƒ»å®¢ã®æƒ…å ±ã‚’æ¸¡ã—ã¦ã‚¹ã‚³ã‚¢è¨ˆç®—ã‚’å®Ÿè¡Œã•ã›ã‚‹
+        //cookingScoreCalclater.CalculateScore(materialIndices, actionIndices, waitingTime);
+    }
+
     private void SubmitCommand(int chobinIndex)
     {
-        UnityEvent serveDish = new();
-        serveDish.AddListener(() => guestCtrl.ServeDish());
-        GetChobin(chobinIndex).SetCommand(serveDish);
+        void serveDish() => SendServeData(chobinIndex);
+        Transform[] target = new Transform[cookingCommandBehaviour.CommandCount];
+        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
+        {
+            target[i] = actions[GetChobin(chobinIndex).ActionIndex[i]].KitchinSpot;
+        }
+        GetChobin(chobinIndex).SetCommand(serveDish, target);
         guestCtrl.ReceiveOrder();
     }
 
@@ -297,7 +348,7 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
         if (EditorApplication.isPlayingOrWillChangePlaymode)
         {
-            Debug.Log("Playƒ‚[ƒh‚É“ü‚é’¼‘O‚Ì‚½‚ßAİ’è‚Ìƒ`ƒFƒbƒN‚Æ‰Šú‰»‚ğƒXƒLƒbƒv‚µ‚Ü‚·B");
+            Debug.Log("Playãƒ¢ãƒ¼ãƒ‰ã«ç§»è¡Œå‰ã®ãŸã‚ã€è¨­å®šã®ãƒã‚§ãƒƒã‚¯ã¨åˆæœŸåŒ–ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ã¾ã™ã€‚");
             return;
         }
         CheckSettings();

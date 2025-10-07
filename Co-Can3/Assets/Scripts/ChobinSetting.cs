@@ -1,51 +1,30 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Events;
-using UnityEngine.UI;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-public class ChobinSetting : MonoBehaviour
+public class ChobinSetting : GameSystem
 {
-    enum SpriteSizeOption
-    {
-        NonKeepAspect, // ƒAƒXƒyƒNƒg”ä‚ğˆÛ‚µ‚È‚¢
-        KeepAspectWithCurrentWidth, // Œ»İ‚Ì•‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
-        KeepAspectWithCurrentHeight, // Œ»İ‚Ì‚‚³‚ğˆÛ‚µ‚ÄƒAƒXƒyƒNƒg”ä‚ğ’²®
-    }
-
-    public class ShowCommandEvent : UnityEvent<int> { }
-
-    [Header("ƒ`ƒ‡ƒrƒ“‚Ìİ’è")]
+    [Header("ãƒãƒ§ãƒ“ãƒ³ã®å‚ç…§")]
+    [Tooltip("ã‚²ãƒ¼ãƒ ã«ç™»å ´ã™ã‚‹ã™ã¹ã¦ã®ãƒãƒ§ãƒ“ãƒ³ã®ãƒªã‚¹ãƒˆ")]
     [SerializeField] private ChobinBehaviour[] chobins;
-    [SerializeField] private Transform WaitingSpot; // ‘Ò‹@êŠ
-    [SerializeField] private Transform ServingSpot; // —¿—‚ğ’ñ‹Ÿ‚·‚éêŠ
-    [SerializeField] private float chobinSpeed; // ƒ`ƒ‡ƒrƒ“‚ÌˆÚ“®‘¬“x
-    [SerializeField] private float chobinAcceleration; // ƒ`ƒ‡ƒrƒ“‚Ì‰Á‘¬“x
-    [SerializeField] private float performingTimeLength = 2f; // ’²—‚É‚©‚©‚éŠÔ
-    [SerializeField] private float waitingSpotRadius = 1f; // ‘Ò‹@êŠ‚Ì”¼Œa
+    [Header("ãƒãƒ§ãƒ“ãƒ³ã®è¡Œå‹•å ´æ‰€")]
+    [Tooltip("ãƒãƒ§ãƒ“ãƒ³ãŒæŒ‡ç¤ºã‚’å¾…ã¤å ´æ‰€")]
+    [SerializeField] private Transform WaitingSpot;
+    [Tooltip("ãƒãƒ§ãƒ“ãƒ³ãŒæ–™ç†ã‚’æä¾›ã™ã‚‹å ´æ‰€")]
+    [SerializeField] private Transform ServingSpot;
 
-    [Header("ƒ`ƒ‡ƒrƒ“‚ğ‘I‘ğ‚·‚éƒ{ƒ^ƒ“‚Æ•\¦‚·‚éCanvas‚ğD&D")]
-    [SerializeField] private GameObject chobinButtonCanvas; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ğ•\¦‚·‚éCanvas
-    [SerializeField] private GameObject chobinButtonPrefab; // ƒ`ƒ‡ƒrƒ“‚ÌUIƒvƒŒƒnƒu
-    [SerializeField] private Sprite chobinButtonSprite; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒXƒvƒ‰ƒCƒg
-    [SerializeField] private string chobinButtonPrefabName = "ChobinButton"; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚Ì–¼‘O
-    [SerializeField] private Vector3 chobinButtonOffset; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌˆÊ’u
-    [SerializeField] private Vector2 chobinButtonSize; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒTƒCƒY
-    [SerializeField] private SpriteSizeOption chobinButtonSizeOption = SpriteSizeOption.NonKeepAspect; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ÌƒTƒCƒYƒIƒvƒVƒ‡ƒ“
-    [SerializeField] private bool buttonIsActiveInEditor = true; // ƒ`ƒ‡ƒrƒ“‚ÌUI‚ğ•\¦‚·‚é‚©‚Ç‚¤‚©
-
-    private UnityEvent checkAllSettings = new();
-    private ShowCommandEvent showCommandEvent = new();
+    [Header("ãƒãƒ§ãƒ“ãƒ³ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿")]
+    [Tooltip("ãƒãƒ§ãƒ“ãƒ³ã®ç§»å‹•é€Ÿåº¦")]
+    [SerializeField] private float chobinSpeed;
+    [Tooltip("ãƒãƒ§ãƒ“ãƒ³ã®åŠ é€Ÿåº¦")]
+    [SerializeField] private float chobinAcceleration;
+    [Tooltip("ãƒãƒ§ãƒ“ãƒ³ãŒå„èª¿ç†ä½œæ¥­ã«ã‹ã‘ã‚‹æ™‚é–“ï¼ˆç§’ï¼‰")]
+    [SerializeField] private float performingTimeLength = 2f;
+    [Tooltip("å¾…æ©Ÿå ´æ‰€ã«åˆ°é”ã—ãŸã¨åˆ¤å®šã•ã‚Œã‚‹åŠå¾„")]
+    [SerializeField] private float waitingSpotRadius = 1f;
 
     private bool AllSettingAreCorrect = true;
     private int commandCount = 1;
-
     public ChobinBehaviour[] Chobins => chobins;
-
-    public UnityEvent CheckAllSettings => checkAllSettings;
-    public ShowCommandEvent ShowCommand => showCommandEvent;
 
     // Start is called before the first frame update
     void Start()
@@ -59,7 +38,7 @@ public class ChobinSetting : MonoBehaviour
 
     }
 
-    public bool CheckSettings()
+    public override bool CheckSettings()
     {
         AllSettingAreCorrect = true;
 
@@ -70,46 +49,30 @@ public class ChobinSetting : MonoBehaviour
                 if (chobins[i] == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour‚Ì”z—ñ‚Énull‚ªŠÜ‚Ü‚ê‚Ä‚¢‚Ü‚·BChobin {i} ‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B");
+                    Debug.LogError($"ChobinBehaviourã®é…åˆ—ã«nullãŒå«ã¾ã‚Œã¦ã„ã¾ã™ã€‚Chobin {i} ã‚’è¨­å®šã—ã¦ãã ã•ã„ã€‚");
                 }
                 else if (chobins[i].GetComponent<NavMeshAgent>() == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour‚ÌNavMeshAgent‚ªChobin {i} ‚Éİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñBNavMeshAgent‚ğ’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B");
+                    Debug.LogError($"ChobinBehaviourã«NavMeshAgentãŒChobin {i} ã«è¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚NavMeshAgentã‚’è¿½åŠ ã—ã¦ãã ã•ã„ã€‚");
                 }
             }
         }
         else
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("ChobinBehaviour‚Ì”z—ñ‚ª‹ó‚Å‚·BChobinBehaviour‚ğƒAƒ^ƒbƒ`‚µ‚Ä‚­‚¾‚³‚¢B");
+            Debug.LogError("ChobinBehaviourã®é…åˆ—ãŒç©ºã§ã™ã€‚ChobinBehaviourã‚’ã‚¢ã‚¿ãƒƒãƒã—ã¦ãã ã•ã„ã€‚");
         }
 
         if (WaitingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("‘Ò‹@êŠ‚ÌTransform‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("å¾…æ©Ÿå ´æ‰€ã®TransformãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
         if (ServingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("—¿—‚ğ’ñ‹Ÿ‚·‚éêŠ‚ÌTransform‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-
-        if (chobinButtonCanvas == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚ÌCanvasƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        if (chobinButtonPrefab == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚Ìƒ{ƒ^ƒ“ƒvƒŒƒnƒu‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
-        }
-        else if (chobinButtonPrefab.GetComponent<Button>() == null || chobinButtonPrefab.GetComponent<Image>() == null || chobinButtonPrefab.GetComponent<RectTransform>() == null)
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ƒ`ƒ‡ƒrƒ“‘I‘ğ—p‚Ìƒ{ƒ^ƒ“ƒvƒŒƒnƒu‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("æ–™ç†ã‚’æä¾›ã§ãã‚‹å ´æ‰€ã®TransformãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
 
         return AllSettingAreCorrect;
@@ -117,80 +80,8 @@ public class ChobinSetting : MonoBehaviour
 
     public void Init()
     {
-#if UNITY_EDITOR
-        if (EditorApplication.isPlaying)
-        {
-            InitChobinButtonParent();
-        }
-        else
-        {
-            bool changeChobinCount = (chobinButtonCanvas.transform.childCount != chobins.Length);
-            if (changeChobinCount)
-            {
-                Debug.Log("ƒ`ƒ‡ƒrƒ“‚Ì”‚ª•ÏX‚³‚ê‚½‚½‚ßAƒ`ƒ‡ƒrƒ“‘I‘ğƒ{ƒ^ƒ“‚ğÄ‰Šú‰»‚µ‚Ü‚·B");
-                EditorApplication.delayCall += InitChobinButtonParent; // ƒ`ƒ‡ƒrƒ“‘I‘ğƒ{ƒ^ƒ“‚ÌeƒIƒuƒWƒFƒNƒg‚ğ‰Šú‰»
-            }
-            else
-            {
-                InitChobins(); // ƒ`ƒ‡ƒrƒ“‚Ìƒpƒ‰ƒ[ƒ^‚ğXV
-            }
-        }
-#else
-        InitChobinButtonParent();
-#endif
-
-        Debug.Log("ChobinSetting‚Ì‰Šú‰»‚ªŠ®—¹‚µ‚Ü‚µ‚½B");
-    }
-
-
-
-    private void InitChobinButtonParent()
-    {
-        // Šù‘¶‚ÌUIƒIƒuƒWƒFƒNƒg‚ğíœ
-        while (chobinButtonCanvas.transform.childCount > 0)
-        {
-            DestroyImmediate(chobinButtonCanvas.transform.GetChild(0).gameObject);
-        }
         for (int i = 0; i < chobins.Length; i++)
         {
-            GameObject chobinButtonObject = null;
-#if UNITY_EDITOR
-            chobinButtonObject = UnityEditor.PrefabUtility.InstantiatePrefab(chobinButtonPrefab, chobinButtonCanvas.transform) as GameObject;
-#else
-            chobinButtonObject = Instantiate(chobinButtonPrefab, chobinButtonCanvas.transform);
-#endif
-            chobinButtonObject.name = chobinButtonPrefabName + "_" + i; // ƒ`ƒ‡ƒrƒ“ƒ{ƒ^ƒ“‚Ì–¼‘O‚ğİ’è
-        }
-
-        InitChobins();
-#if UNITY_EDITOR
-        EditorApplication.delayCall -= InitChobinButtonParent; // ˆê“x‚¾‚¯Às‚·‚é‚½‚ß‚É‰ğœ
-#endif
-    }
-
-    private void InitChobins()
-    {
-        chobinButtonSize = SpriteSize(chobinButtonSprite, chobinButtonSize, chobinButtonSizeOption);
-
-        for (int i = 0; i < chobins.Length; i++)
-        {
-            // UI‚ÌˆÊ’u‚ğİ’è
-            GameObject chobinButtonObject = chobinButtonCanvas.transform.GetChild(i).gameObject;
-            Button chobinButton = chobinButtonObject.GetComponent<Button>();
-            RectTransform chobinButtonRect = chobinButtonObject.GetComponent<RectTransform>();
-            chobinButtonRect.sizeDelta = chobinButtonSize;
-            Image chobinImage = chobinButtonObject.GetComponent<Image>();
-            if (chobinImage != null)
-            {
-                chobinImage.sprite = chobinButtonSprite;
-            }
-            if (chobinButton != null)
-            {
-                int chobinIndex = i; // ƒ[ƒJƒ‹•Ï”‚ğg—p‚µ‚ÄƒNƒ[ƒWƒƒ[‚Ì–â‘è‚ğ‰ñ”ğ
-                chobinButton.onClick.RemoveAllListeners();
-                chobinButton.onClick.AddListener(() => showCommandEvent.Invoke(chobinIndex));
-            }
-
             if (chobins[i] != null)
             {
                 NavMeshAgent agent = chobins[i].GetComponent<NavMeshAgent>();
@@ -201,64 +92,14 @@ public class ChobinSetting : MonoBehaviour
                 }
                 chobins[i].SetWaitingSpot(WaitingSpot, waitingSpotRadius);
                 chobins[i].SetServingSpot(ServingSpot);
-                chobins[i].SetSelectButton(chobinButtonObject, chobinButtonOffset);
                 chobins[i].SetPerformingTimeLength(performingTimeLength);
                 chobins[i].Init(i, commandCount);
             }
-
-#if UNITY_EDITOR
-            if (EditorApplication.isPlaying)
-            {
-                chobinButtonObject.SetActive(false);
-            }
-            else
-            {
-                chobinButtonObject.SetActive(buttonIsActiveInEditor);
-            }
-#else
-            chobinButtonObject.SetActive(false);
-#endif
         }
-    }
-
-    private Vector2 SpriteSize(Sprite sprite, Vector2 targetSize, SpriteSizeOption spriteSizeOption)
-    {
-        Vector2 newSize = targetSize;
-        switch (spriteSizeOption)
-        {
-            case SpriteSizeOption.NonKeepAspect:
-                // ‚»‚Ì‚Ü‚Ü
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentWidth:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.height / sprite.rect.width;
-                    newSize.y = newSize.x * aspectRatio;
-                }
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentHeight:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.width / sprite.rect.height;
-                    newSize.x = newSize.y * aspectRatio;
-                }
-                break;
-        }
-        return newSize;
     }
 
     public void SetCommandCount(int _commandCount)
     {
         commandCount = _commandCount;
     }
-
-    /// <summary>
-    /// ƒGƒfƒBƒ^ã‚Åƒpƒ‰ƒ[ƒ^‚ª•ÏX‚³‚ê‚½‚Æ‚«‚Éİ’è‚ğƒ`ƒFƒbƒN‚µ‚Ä‰Šú‰»‚ğs‚¤
-    /// </summary>
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        checkAllSettings.Invoke();
-    }
-#endif
 }

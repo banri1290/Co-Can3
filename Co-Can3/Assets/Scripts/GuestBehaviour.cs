@@ -4,16 +4,17 @@ public class GuestBehaviour : MonoBehaviour
 {
     public enum Status
     {
-        None = -1, // –¢İ’è
-        Entering = 0, // “ü“X’†
-        WaitingOrder = 1, // ’•¶‘Ò‚¿
-        Ordering = 2, // ’•¶’†
-        WaitingDish = 3,  // ‘Ò‹@’†
-        GotDish = 4, // ’•¶ó‚¯æ‚èÏ‚İ
+        None = -1, // æœªè¨­å®š
+        Entering = 0, // å…¥åº—ä¸­
+        WaitingOrder = 1, // æ³¨æ–‡å¾…ã¡
+        Ordering = 2, // æ³¨æ–‡ä¸­
+        WaitingDish = 3,  // æä¾›å¾…ã¡
+        GotDish = 4, // æ–™ç†ã‚’å—ã‘å–ã‚Šé€€åº—ä¸­
     }
 
     public class GuestEvent : UnityEngine.Events.UnityEvent<int> { }
 
+    [Tooltip("å®¢ã®ç§»å‹•é€Ÿåº¦ã€‚GuestCtrlã‹ã‚‰è¨­å®šã•ã‚Œã¾ã™ã€‚")]
     [SerializeField] private float speed;
 
     private GuestEvent guestEvent = new();
@@ -22,11 +23,14 @@ public class GuestBehaviour : MonoBehaviour
     private Status status = Status.None;
     private Vector3 targetPosition;
     private bool hasMovedFlag = false;
+    private bool isWaiting = false;
+    private float waitTimer = 0f;
 
     public int ID => id;
     public Status CurrentStatus => status;
 
     public GuestEvent GuestEventInstance => guestEvent;
+    public float WaitingTimer => waitTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -38,11 +42,14 @@ public class GuestBehaviour : MonoBehaviour
     void Update()
     {
         Move();
+        if (isWaiting) CountWaitingTime();
     }
 
     public void Init(int guestId)
     {
         id = guestId;
+        isWaiting = false;
+        waitTimer = 0f;
         SetState(Status.Entering);
     }
 
@@ -78,25 +85,34 @@ public class GuestBehaviour : MonoBehaviour
         }
     }
 
+    private void CountWaitingTime()
+    {
+        waitTimer += Time.deltaTime;
+    }
+
+    public void StartWaiting()
+    {
+        isWaiting = true;
+        waitTimer = 0f;
+    }
+
     public void SetState(Status _status)
     {
         status = _status;
         switch (status)
         {
             case Status.Entering:
-                // “ü“X’†‚Ìˆ—
+                // å…¥åº—ä¸­ã®å‡¦ç†
                 break;
             case Status.WaitingOrder:
-                // ’•¶‘Ò‚¿‚Ìˆ—
                 break;
             case Status.Ordering:
-                // ’•¶’†‚Ìˆ—
                 break;
             case Status.WaitingDish:
-                // ‘Ò‹@’†‚Ìˆ—
+                // æä¾›å¾…ã¡ã®å‡¦ç†
                 break;
             case Status.GotDish:
-                // ’•¶ó‚¯æ‚èÏ‚İ‚Ìˆ—
+                isWaiting = false;
                 break;
         }
     }

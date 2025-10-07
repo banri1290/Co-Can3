@@ -2,28 +2,39 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-public class GuestCtrl : MonoBehaviour
+public class GuestCtrl : GameSystem
 {
-    [SerializeField] GuestBehaviour GuestPrafab;
-    [SerializeField] Transform spawnSpot;
-    [SerializeField] Transform orderingSpot;
-    [SerializeField] Transform waitingServeSpot;
-    [SerializeField] Transform exitSpot;
-    [SerializeField] Vector3 waitingOrderOffset = new Vector3(0, 0, 1);
-    [SerializeField] Vector3 waitingServeOffset = new(0, 0, 1); // ’•¶‘Ò‚¿‚Ì‹q‚Ì‘Ò‹@êŠ‚ÌƒIƒtƒZƒbƒg
-    [SerializeField] Vector3 waitingDirection = new(1, 0, 0); // ’•¶‘Ò‚¿‚Ì‹q‚ÌŒü‚«
-    [SerializeField] float SpawnIntervalMin;
-    [SerializeField] float SpawnIntervalMax;
-    [SerializeField] int totalGuestNum; // ŒÄ‚Ño‚·‹q‚Ì‘”
-    [SerializeField] int maxGuestNum; // “¯‚É‘¶İ‚Å‚«‚é‹q‚ÌÅ‘å”
+    [Header("å‚ç…§è¨­å®š")]
+    [Tooltip("ç”Ÿæˆã™ã‚‹å®¢ã®ãƒ—ãƒ¬ãƒãƒ–")]
+    [SerializeField] private GuestBehaviour GuestPrafab;
+    [Tooltip("å®¢ã®å‡ºç¾å ´æ‰€")]
+    [SerializeField] private Transform spawnSpot;
+    [Tooltip("å®¢ãŒæ³¨æ–‡ã‚’ã™ã‚‹å ´æ‰€")]
+    [SerializeField] private Transform orderingSpot;
+    [Tooltip("å®¢ãŒæ–™ç†ã‚’å¾…ã¤å ´æ‰€")]
+    [SerializeField] private Transform waitingServeSpot;
+    [Tooltip("å®¢ãŒé€€åº—ã™ã‚‹å ´æ‰€")]
+    [SerializeField] private Transform exitSpot;
 
-    [Header("‹q‚Ìİ’è")]
-    [SerializeField] private float speed = 1f; // ‹q‚ÌˆÚ“®‘¬“x
+    [Header("å®¢ã®å‡ºç¾ã¨å¾…æ©Ÿè¨­å®š")]
+    [Tooltip("æ³¨æ–‡å¾…ã¡ã®åˆ—ã«ãŠã‘ã‚‹å®¢åŒå£«ã®é–“éš”")]
+    [SerializeField] private Vector3 waitingOrderOffset = new Vector3(0, 0, 1);
+    [Tooltip("æä¾›å¾…ã¡ã®åˆ—ã«ãŠã‘ã‚‹å®¢åŒå£«ã®é–“éš”")]
+    [SerializeField] private Vector3 waitingServeOffset = new(0, 0, 1);
+    [Tooltip("å¾…æ©Ÿä¸­ã®å®¢ãŒå‘ãæ–¹å‘")]
+    [SerializeField] private Vector3 waitingDirection = new(1, 0, 0);
+    [Tooltip("å®¢ãŒå‡ºç¾ã™ã‚‹æœ€çŸ­é–“éš”ï¼ˆç§’ï¼‰")]
+    [SerializeField] private float SpawnIntervalMin;
+    [Tooltip("å®¢ãŒå‡ºç¾ã™ã‚‹æœ€é•·é–“éš”ï¼ˆç§’ï¼‰")]
+    [SerializeField] private float SpawnIntervalMax;
+    [Tooltip("ã‚²ãƒ¼ãƒ ä¸­ã«ç™»å ´ã™ã‚‹å®¢ã®ç·æ•°")]
+    [SerializeField] private int totalGuestNum;
+    [Tooltip("åº—å†…ã«åŒæ™‚ã«å­˜åœ¨ã§ãã‚‹å®¢ã®æœ€å¤§æ•°")]
+    [SerializeField] private int maxGuestNum;
+
+    [Header("å®¢ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š")]
+    [Tooltip("å®¢ã®ç§»å‹•é€Ÿåº¦")]
+    [SerializeField] private float speed = 1f;
 
     List<GuestBehaviour> guestList = new();
 
@@ -34,11 +45,9 @@ public class GuestCtrl : MonoBehaviour
     private int guestOrderCounter;
     private int guestExitCounter;
 
-    private UnityEvent checkAllSettings = new();
     private UnityEvent hasGuestWaitingForOrderEvent = new();
     private UnityEvent leftGuestWaitingForOrderEvent = new();
 
-    public UnityEvent CheckAllSettings => checkAllSettings;
     public UnityEvent HasGuestWaitingForOrder => hasGuestWaitingForOrderEvent;
     public UnityEvent LeftGuestWaitingForOrder => leftGuestWaitingForOrderEvent;
 
@@ -57,16 +66,16 @@ public class GuestCtrl : MonoBehaviour
         }
     }
 
-    public bool CheckSetings()
+    public override bool CheckSettings()
     {
         if (SpawnIntervalMin < 0)
         {
-            Debug.LogWarning("SpawnIntervalMin‚Ì’l‚ª•s³‚Å‚·B0ˆÈã‚Ì’l‚ÉC³‚µ‚Ü‚·B");
+            Debug.LogWarning("SpawnIntervalMinã®å€¤ãŒä¸æ­£ã§ã™ã€‚0ä»¥ä¸Šã®å€¤ã«ä¿®æ­£ã—ã¾ã™ã€‚");
             SpawnIntervalMin = 0;
         }
         if (SpawnIntervalMax < SpawnIntervalMin)
         {
-            Debug.LogWarning("SpawnIntervalMax‚Ì’l‚ª•s³‚Å‚·BSpawnIntervalMin‚Æ“¯‚¶’l‚ÉC³‚µ‚Ü‚·B");
+            Debug.LogWarning("SpawnIntervalMaxã®å€¤ãŒä¸æ­£ã§ã™ã€‚SpawnIntervalMinã¨åŒã˜å€¤ã«ä¿®æ­£ã—ã¾ã™ã€‚");
             SpawnIntervalMax = SpawnIntervalMin;
         }
 
@@ -74,27 +83,27 @@ public class GuestCtrl : MonoBehaviour
         if (GuestPrafab == null)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("GuestPrafab‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("GuestPrafabãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
         if (spawnSpot == null)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("spawnSpot‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("spawnSpotãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
         if (orderingSpot == null)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("orderingSpot‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("orderingSpotãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
         if (waitingServeSpot == null)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("waitingServeSpot‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("waitingServeSpotãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
         if (exitSpot == null)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("exitSpot‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+            Debug.LogError("exitSpotãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
         }
 
         return AllSettingsAreCorrect;
@@ -107,7 +116,7 @@ public class GuestCtrl : MonoBehaviour
         guestOrderCounter = 0;
         guestExitCounter = 0;
 
-        Debug.Log("GuestCtrl‚Ì‰Šú‰»‚ªŠ®—¹‚µ‚Ü‚µ‚½B");
+        Debug.Log("GuestCtrlã®åˆæœŸåŒ–ãŒå®Œäº†ã—ã¾ã—ãŸã€‚");
     }
 
     private void CountSpawnTimer()
@@ -136,7 +145,7 @@ public class GuestCtrl : MonoBehaviour
     }
 
     /// <summary>
-    /// ’•¶‚ğó‚¯•t‚¯‚½‚Æ‚«‚ÉŒÄ‚Ño‚·ƒƒ]ƒbƒg
+    /// æ³¨æ–‡ã‚’å—ã‘ä»˜ã‘ãŸæ™‚ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
     /// </summary>
     public void ReceiveOrder()
     {
@@ -168,10 +177,16 @@ public class GuestCtrl : MonoBehaviour
         guestExitCounter++;
     }
 
+    public GuestBehaviour GetServedGuest()
+    {
+        return guestList[guestExitCounter - 1];
+    }
+
     private void SendGuestMessage(int guestId)
     {
-        guestList[guestId].SetDirection(waitingDirection);
-        GuestBehaviour.Status status = guestList[guestId].CurrentStatus;
+        GuestBehaviour guest = guestList[guestId];
+        guest.SetDirection(waitingDirection);
+        GuestBehaviour.Status status = guest.CurrentStatus;
         switch (status)
         {
             case GuestBehaviour.Status.None:
@@ -180,18 +195,19 @@ public class GuestCtrl : MonoBehaviour
                 if (guestId == guestOrderCounter)
                 {
                     hasGuestWaitingForOrderEvent.Invoke();
-                    guestList[guestId].SetState(GuestBehaviour.Status.Ordering);
+                    guest.SetState(GuestBehaviour.Status.Ordering);
                 }
                 else
                 {
-                    guestList[guestId].SetState(GuestBehaviour.Status.WaitingOrder);
+                    guest.SetState(GuestBehaviour.Status.WaitingOrder);
                 }
+                guest.StartWaiting();
                 break;
             case GuestBehaviour.Status.WaitingOrder:
                 if (guestId == guestOrderCounter)
                 {
                     hasGuestWaitingForOrderEvent.Invoke();
-                    guestList[guestId].SetState(GuestBehaviour.Status.Ordering);
+                    guest.SetState(GuestBehaviour.Status.Ordering);
                 }
                 break;
             case GuestBehaviour.Status.Ordering:
@@ -199,21 +215,14 @@ public class GuestCtrl : MonoBehaviour
             case GuestBehaviour.Status.WaitingDish:
                 break;
             case GuestBehaviour.Status.GotDish:
-                if (guestId == guestExitCounter)
+                if (guestId < guestExitCounter)
                 {
-                    Destroy(guestList[guestId].gameObject);
-                    guestList[guestId] = null;
+                    Destroy(guest.gameObject);
+                    guest = null;
                 }
                 break;
             default:
                 break;
         }
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        checkAllSettings.Invoke();
-    }
-#endif
 }
