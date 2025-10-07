@@ -3,26 +3,25 @@ using UnityEngine.AI;
 
 public class ChobinSetting : GameSystem
 {
-    [Header("繝√Ι繝薙Φ縺ｮ蜿ら�")]
-    [Tooltip("繧ｲ繝ｼ繝縺ｫ逋ｻ蝣ｴ縺吶ｋ縺吶∋縺ｦ縺ｮ繝√Ι繝薙Φ縺ｮ繝ｪ繧ｹ繝")]
+    [Header("チョビンの設定")]
+    [Tooltip("シーンに存在するすべてのチョビンのリスト")]
     [SerializeField] private ChobinBehaviour[] chobins;
-    [Header("繝√Ι繝薙Φ縺ｮ陦悟虚蝣ｴ謇")]
-    [Tooltip("繝√Ι繝薙Φ縺梧欠遉ｺ繧貞ｾ�▽蝣ｴ謇")]
+    [Header("チョビンの待機場所")]
+    [Tooltip("チョビンが待機する場所")]
     [SerializeField] private Transform WaitingSpot;
-    [Tooltip("繝√Ι繝薙Φ縺梧侭逅�ｒ謠蝉ｾ帙☆繧句ｴ謇")]
+    [Tooltip("チョビンが配膳を行う場所")]
     [SerializeField] private Transform ServingSpot;
 
-    [Header("繝√Ι繝薙Φ縺ｮ繝代Λ繝｡繝ｼ繧ｿ")]
-    [Tooltip("繝√Ι繝薙Φ縺ｮ遘ｻ蜍暮溷ｺｦ")]
+    [Header("チョビンのパラメータ")]
+    [Tooltip("チョビンの移動速度")]
     [SerializeField] private float chobinSpeed;
-    [Tooltip("繝√Ι繝薙Φ縺ｮ蜉騾溷ｺｦ")]
+    [Tooltip("チョビンの加速度")]
     [SerializeField] private float chobinAcceleration;
-    [Tooltip("繝√Ι繝薙Φ縺悟推隱ｿ逅�ｽ懈･ｭ縺ｫ縺九￠繧区凾髢難ｼ育ｧ抵ｼ")]
+    [Tooltip("チョビンが配膳後に行動にかける時間（秒）")]
     [SerializeField] private float performingTimeLength = 2f;
-    [Tooltip("蠕�ｩ溷ｴ謇縺ｫ蛻ｰ驕斐＠縺溘→蛻､螳壹＆繧後ｋ蜊雁ｾ")]
+    [Tooltip("待機場所に到着したと判定される半径")]
     [SerializeField] private float waitingSpotRadius = 1f;
 
-    private bool AllSettingAreCorrect = true;
     private int commandCount = 1;
     public ChobinBehaviour[] Chobins => chobins;
 
@@ -35,20 +34,12 @@ public class ChobinSetting : GameSystem
     // Update is called once per frame
     void Update()
     {
-        // performingTimeLengthの値に応じてSliderを更新
-        if (performingTimeSlider != null)
-        {
-            // 例: performingTimeLengthが最大値、0が最小値
-            performingTimeSlider.maxValue = performingTimeLength;
-            // performingTimeLengthの進行度を表示（ここでは仮に減少していく例）
-            // 実際はChobinBehaviourから進行度を取得して反映するのが理想
-            performingTimeSlider.value = Mathf.Clamp(performingTimeLength, 0, performingTimeSlider.maxValue);
-        }
+        
     }
 
     public override bool CheckSettings()
     {
-        AllSettingAreCorrect = true;
+        bool AllSettingAreCorrect = true;
 
         if (chobins.Length > 0)
         {
@@ -57,30 +48,30 @@ public class ChobinSetting : GameSystem
                 if (chobins[i] == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour縺ｮ驟榊�縺ｫnull縺悟性縺ｾ繧後※縺�∪縺吶�hobin {i} 繧定ｨｭ螳壹＠縺ｦ縺上□縺輔＞縲");
+                    Debug.LogError($"ChobinBehaviourの配列にnullが含まれています。Chobin {i} を設定してください。");
                 }
                 else if (chobins[i].GetComponent<NavMeshAgent>() == null)
                 {
                     AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviour縺ｫNavMeshAgent縺靴hobin {i} 縺ｫ險ｭ螳壹＆繧後※縺�∪縺帙ｓ縲�avMeshAgent繧定ｿｽ蜉縺励※縺上□縺輔＞縲");
+                    Debug.LogError($"ChobinBehaviourにNavMeshAgentがChobin {i} に設定されていません。NavMeshAgentを追加してください。");
                 }
             }
         }
         else
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("ChobinBehaviour縺ｮ驟榊�縺檎ｩｺ縺ｧ縺吶�hobinBehaviour繧偵い繧ｿ繝�メ縺励※縺上□縺輔＞縲");
+            Debug.LogError("ChobinBehaviourの配列が空です。ChobinBehaviourをアタッチしてください。");
         }
 
         if (WaitingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("蠕�ｩ溷ｴ謇縺ｮTransform縺瑚ｨｭ螳壹＆繧後※縺�∪縺帙ｓ縲");
+            Debug.LogError("待機場所のTransformが設定されていません。");
         }
         if (ServingSpot == null)
         {
             AllSettingAreCorrect = false;
-            Debug.LogError("譁咏炊繧呈署萓帙〒縺阪ｋ蝣ｴ謇縺ｮTransform縺瑚ｨｭ螳壹＆繧後※縺�∪縺帙ｓ縲");
+            Debug.LogError("配膳を行う場所のTransformが設定されていません。");
         }
 
         return AllSettingAreCorrect;
