@@ -57,4 +57,14 @@ public class PlayerAnimeController : MonoBehaviour
 
         lastX = currentX;
     }
+
+
+    void LateUpdate()
+    {
+        if (spriteTransform != null && Camera.main != null)
+        {
+            spriteTransform.forward = Camera.main.transform.forward;
+        }
+    }
+
 }
