@@ -66,10 +66,11 @@ public class ChobinBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SetButtonPosition();
+
         switch (status)
         {
             case Status.CommandWaitiating:
-                CommandWaiting();
                 break;
             case Status.Moving:
                 MovingBehave();
@@ -103,7 +104,6 @@ public class ChobinBehaviour : MonoBehaviour
         materialIndex = new int[count];
         actionIndex = new int[count];
         SetState(Status.CommandWaitiating);
-        CommandWaiting();
         for (int i = 0; i < count; i++)
         {
             target[i] = null;
@@ -130,17 +130,23 @@ public class ChobinBehaviour : MonoBehaviour
     {
         selectButton = _selectButton;
         buttonRect = selectButton.GetComponent<RectTransform>();
+        SetButtonOffset(_selectButtonOffset);
+    }
+
+    public void SetButtonOffset(Vector3 _selectButtonOffset)
+    {
         selectButtonOffset = _selectButtonOffset;
+        SetButtonPosition();
+    }
+
+    void SetButtonPosition()
+    {
+        selectButton.transform.position = transform.position + selectButtonOffset;
     }
 
     public void SetPerformingTimeLength(float _performingTimeLength)
     {
         performingTimeLength = _performingTimeLength;
-    }
-
-    void CommandWaiting()
-    {
-        selectButton.transform.position = transform.position + selectButtonOffset;
     }
 
     void MovingBehave()

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -21,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     // --- 主要な制御コンポーネント ---
     [Header("UI & Command Control")]
-    [Tooltip("UIから調理コマンドを受け付け、表示を管理するビヘイビア。")]
+    [Tooltip("UIから調理コマンドを受け付け、表示を管理するコンポーネント。")]
     [SerializeField] private CookingCommandBehaviour cookingCommandBehaviour;
 
     [Header("Chobin Buttons Control")]
@@ -39,6 +38,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CookingScoreCalclater cookingScoreCalclater;
 
     private ChobinSetting chobinSetting;
+
+    private int currentCookingCHobinNum = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -125,6 +126,8 @@ public class GameManager : MonoBehaviour
 
     private void Init()
     {
+        currentCookingCHobinNum = 0;
+
         InitCookingCommand();
         InitChobinSetting();
         InitGuestCtrl();
@@ -296,6 +299,7 @@ public class GameManager : MonoBehaviour
     private void SendServeData(int chobinIndex)
     {
         guestCtrl.ServeDish();
+        currentCookingCHobinNum--;
         // 料理を受け取った客
         GuestBehaviour guest = guestCtrl.GetServedGuest();
         // 料理を提供したチョビン
@@ -319,6 +323,7 @@ public class GameManager : MonoBehaviour
 
     private void SubmitCommand(int chobinIndex)
     {
+        currentCookingCHobinNum++;
         void serveDish() => SendServeData(chobinIndex);
         Transform[] target = new Transform[cookingCommandBehaviour.CommandCount];
         for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
@@ -326,6 +331,7 @@ public class GameManager : MonoBehaviour
             target[i] = actions[GetChobin(chobinIndex).ActionIndex[i]].KitchinSpot;
         }
         GetChobin(chobinIndex).SetCommand(serveDish, target);
+
         guestCtrl.ReceiveOrder();
     }
 

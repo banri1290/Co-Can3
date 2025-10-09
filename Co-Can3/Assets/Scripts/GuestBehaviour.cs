@@ -12,12 +12,10 @@ public class GuestBehaviour : MonoBehaviour
         GotDish = 4, // 料理を受け取り退店中
     }
 
-    public class GuestEvent : UnityEngine.Events.UnityEvent<int> { }
-
     [Tooltip("客の移動速度。GuestCtrlから設定されます。")]
     [SerializeField] private float speed;
 
-    private GuestEvent guestEvent = new();
+    private EventWithInt guestEvent = new();
 
     private int id;
     private Status status = Status.None;
@@ -29,7 +27,7 @@ public class GuestBehaviour : MonoBehaviour
     public int ID => id;
     public Status CurrentStatus => status;
 
-    public GuestEvent GuestEventInstance => guestEvent;
+    public EventWithInt GuestEventInstance => guestEvent;
     public float WaitingTimer => waitTimer;
 
     // Start is called before the first frame update

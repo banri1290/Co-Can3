@@ -44,18 +44,14 @@ public class GuestCtrl : GameSystem
     private int guestComeCounter;
     private int guestOrderCounter;
     private int guestExitCounter;
+    private int currentGuestNum;
 
     private UnityEvent hasGuestWaitingForOrderEvent = new();
     private UnityEvent leftGuestWaitingForOrderEvent = new();
 
     public UnityEvent HasGuestWaitingForOrder => hasGuestWaitingForOrderEvent;
     public UnityEvent LeftGuestWaitingForOrder => leftGuestWaitingForOrderEvent;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+    public int CurrentGuestNum => currentGuestNum;
 
     // Update is called once per frame
     void Update()
@@ -115,6 +111,7 @@ public class GuestCtrl : GameSystem
         guestComeCounter = 0;
         guestOrderCounter = 0;
         guestExitCounter = 0;
+        currentGuestNum = 0;
 
         Debug.Log("GuestCtrlの初期化が完了しました。");
     }
@@ -175,6 +172,7 @@ public class GuestCtrl : GameSystem
             guestList[i].SetDestination(waitingServeSpot.position + waitingServeOffset * differenceCount);
         }
         guestExitCounter++;
+        currentGuestNum--;
     }
 
     public GuestBehaviour GetServedGuest()
@@ -202,6 +200,7 @@ public class GuestCtrl : GameSystem
                     guest.SetState(GuestBehaviour.Status.WaitingOrder);
                 }
                 guest.StartWaiting();
+                currentGuestNum++;
                 break;
             case GuestBehaviour.Status.WaitingOrder:
                 if (guestId == guestOrderCounter)
