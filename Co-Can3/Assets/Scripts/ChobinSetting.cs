@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,9 +8,9 @@ public class ChobinSetting : GameSystem
     [Tooltip("シーンに存在するすべてのチョビンのリスト")]
     [SerializeField] private ChobinBehaviour[] chobins;
     [Header("チョビンの待機場所")]
-    [Tooltip("チョビンが待機する場所")]
+    [Tooltip("チョビンが命令を待つ場所")]
     [SerializeField] private Transform WaitingSpot;
-    [Tooltip("チョビンが配膳を行う場所")]
+    [Tooltip("チョビンが配膳を実行する場所")]
     [SerializeField] private Transform ServingSpot;
 
     [Header("チョビンのパラメータ")]
@@ -17,7 +18,7 @@ public class ChobinSetting : GameSystem
     [SerializeField] private float chobinSpeed;
     [Tooltip("チョビンの加速度")]
     [SerializeField] private float chobinAcceleration;
-    [Tooltip("チョビンが配膳後に行動にかける時間（秒）")]
+    [Tooltip("チョビンが配膳行動等にかける時間（秒）")]
     [SerializeField] private float performingTimeLength = 2f;
     [Tooltip("待機場所に到着したと判定される半径")]
     [SerializeField] private float waitingSpotRadius = 1f;
@@ -39,52 +40,55 @@ public class ChobinSetting : GameSystem
 
     public override bool CheckSettings()
     {
-        bool AllSettingAreCorrect = true;
+        bool allSettingAreCorrect = true;
 
-        if (chobins.Length > 0)
+        if (chobins == null || chobins.Length == 0)
+        {
+            allSettingAreCorrect = false;
+            Debug.LogError("ChobinBehaviourの配列が空です。ChobinBehaviourをアタッチしてください。");
+        }
+        else
         {
             for (int i = 0; i < chobins.Length; i++)
             {
                 if (chobins[i] == null)
                 {
-                    AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviourの配列にnullが含まれています。Chobin {i} を設定してください。");
+                    allSettingAreCorrect = false;
+                    Debug.LogError($"ChobinBehaviourの配列にnullが含まれています。chobin {i} を設定してください。");
+                    continue;
                 }
-                else if (chobins[i].GetComponent<NavMeshAgent>() == null)
+                
+                if (chobins[i].GetComponent<NavMeshAgent>() == null)
                 {
-                    AllSettingAreCorrect = false;
-                    Debug.LogError($"ChobinBehaviourにNavMeshAgentがChobin {i} に設定されていません。NavMeshAgentを追加してください。");
+                    allSettingAreCorrect = false;
+                    Debug.LogError($"ChobinBehaviourにNavMeshAgentがchobin {i} に設定されていません。NavMeshAgentを追加してください。");
                 }
             }
-        }
-        else
-        {
-            AllSettingAreCorrect = false;
-            Debug.LogError("ChobinBehaviourの配列が空です。ChobinBehaviourをアタッチしてください。");
         }
 
         if (WaitingSpot == null)
         {
-            AllSettingAreCorrect = false;
+            allSettingAreCorrect = false;
             Debug.LogError("待機場所のTransformが設定されていません。");
         }
         if (ServingSpot == null)
         {
-            AllSettingAreCorrect = false;
-            Debug.LogError("配膳を行う場所のTransformが設定されていません。");
+            allSettingAreCorrect = false;
+            Debug.LogError("配膳を実行できる場所のTransformが設定されていません。");
         }
 
-        return AllSettingAreCorrect;
+        return allSettingAreCorrect;
     }
 
     public void Init()
     {
+        if (chobins == null) return;
+
         for (int i = 0; i < chobins.Length; i++)
         {
             if (chobins[i] != null)
             {
-                NavMeshAgent agent = chobins[i].GetComponent<NavMeshAgent>();
-                if (agent != null)
+                if (chobins[i].TryGetComponent<NavMeshAgent>(out var agent))
                 {
                     agent.speed = chobinSpeed;
                     agent.acceleration = chobinAcceleration;

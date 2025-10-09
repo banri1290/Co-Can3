@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 275d62474f89f61429ae7443ce23f80d
+guid: 7f402ae64752a8649bb24644c2ca46da
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -39,7 +39,7 @@ TextureImporter:
     mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: 1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -97,127 +97,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Chobin_Bchef_Anim_0
+      name: RChobin_Bchef_Anim_0
       rect:
         serializedVersion: 2
-        x: 145
-        y: 1030
-        width: 289
-        height: 321
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f99198fb04d04df4ebdc3cf66e3f2296
-      internalID: -497905773
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Chobin_Bchef_Anim_1
-      rect:
-        serializedVersion: 2
-        x: 784
+        x: 79
         y: 1043
         width: 290
         height: 293
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e44fb1d4adf4476498ad8b8b186f4713
-      internalID: -123997392
+      spriteID: 4001ff90f6659a54f9c548b957816e33
+      internalID: -489063435
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Chobin_Bchef_Anim_2
+      name: RChobin_Bchef_Anim_1
       rect:
         serializedVersion: 2
-        x: 142
-        y: 563
-        width: 292
-        height: 295
+        x: 719
+        y: 1030
+        width: 289
+        height: 321
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2d97b75eac5bff3419783f965ad736e5
-      internalID: 786100888
+      spriteID: 806b8cc6753584e4c829867e015329f9
+      internalID: 1895215267
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Chobin_Bchef_Anim_3
+      name: RChobin_Bchef_Anim_2
       rect:
         serializedVersion: 2
-        x: 784
+        x: 79
         y: 545
         width: 290
         height: 329
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 245260d5ee247a6449ab1959e0cb1d1c
-      internalID: -1550567682
+      spriteID: dc29a26d1768ca746b751ce6e5d02929
+      internalID: -1527736856
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Chobin_Bchef_Anim_4
+      name: RChobin_Bchef_Anim_3
       rect:
         serializedVersion: 2
-        x: 145
-        y: 64
-        width: 289
-        height: 315
+        x: 719
+        y: 563
+        width: 292
+        height: 295
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 89f6db366f0e5544dac65f2fe2b4379e
-      internalID: -1364505551
+      spriteID: d61c68eaf5b497d46a250f55aacb2fee
+      internalID: -486776782
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Chobin_Bchef_Anim_5
+      name: RChobin_Bchef_Anim_4
       rect:
         serializedVersion: 2
-        x: 783
+        x: 79
         y: 83
         width: 291
         height: 291
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 84e71a749c9467645849418bedd1c368
-      internalID: -1587832810
+      spriteID: 4a34735a69361ff4fad2743fb67e0448
+      internalID: -1726494950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: RChobin_Bchef_Anim_5
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 64
+        width: 289
+        height: 315
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 275aeee9f0634d345a267facd4e15453
+      internalID: 1531655065
       vertices: []
       indices: 
       edges: []
@@ -225,7 +225,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: d1fcea6c62e0dcc45b8f847532b9acc8
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -233,12 +233,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Chobin_Bchef_Anim_0: -497905773
-      Chobin_Bchef_Anim_1: -123997392
-      Chobin_Bchef_Anim_2: 786100888
-      Chobin_Bchef_Anim_3: -1550567682
-      Chobin_Bchef_Anim_4: -1364505551
-      Chobin_Bchef_Anim_5: -1587832810
+      RChobin_Bchef_Anim_0: -489063435
+      RChobin_Bchef_Anim_1: 1895215267
+      RChobin_Bchef_Anim_2: -1527736856
+      RChobin_Bchef_Anim_3: -486776782
+      RChobin_Bchef_Anim_4: -1726494950
+      RChobin_Bchef_Anim_5: 1531655065
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

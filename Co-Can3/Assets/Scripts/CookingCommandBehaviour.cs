@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 
 #if UNITY_EDITOR
@@ -22,6 +23,8 @@ public class CookingCommandBehaviour : GameSystem
         KeepAspectWithCurrentWidth, // 現在の幅を維持してアスペクト比を維持
         KeepAspectWithCurrentHeight, // 現在の高さを維持してアスペクト比を維持
     }
+
+    public class SelectCommandEvent : UnityEvent<int, int> { }
 
     [Header("UIモード設定")]
     [Tooltip("true: 画像で表示, false: テキストで表示")]
@@ -97,20 +100,20 @@ public class CookingCommandBehaviour : GameSystem
     private Button[] actionLeftButtons;
     private Button[] actionRightButtons;
 
-    private EventWith2Int previousMaterialEvent = new();
-    private EventWith2Int nextMaterialEvent = new();
-    private EventWith2Int previousActionEvent = new();
-    private EventWith2Int nextActionEvent = new();
+    private SelectCommandEvent previousMaterialEvent = new();
+    private SelectCommandEvent nextMaterialEvent = new();
+    private SelectCommandEvent previousActionEvent = new();
+    private SelectCommandEvent nextActionEvent = new();
     private UnityEvent submitCommandEvent = new();
 
     private int currentChobinUIIndex;
 
     public int CommandCount => commandCount; // 指示の行数
     public int CurrentChobinUIIndex => currentChobinUIIndex;
-    public EventWith2Int PreviousMaterialEvent => previousMaterialEvent;
-    public EventWith2Int NextMaterialEvent => nextMaterialEvent;
-    public EventWith2Int PreviousActionEvent => previousActionEvent;
-    public EventWith2Int NextActionEvent => nextActionEvent;
+    public SelectCommandEvent PreviousMaterialEvent => previousMaterialEvent;
+    public SelectCommandEvent NextMaterialEvent => nextMaterialEvent;
+    public SelectCommandEvent PreviousActionEvent => previousActionEvent;
+    public SelectCommandEvent NextActionEvent => nextActionEvent;
     public UnityEvent SubmitCommandEvent => submitCommandEvent;
 
     // 初期化処理

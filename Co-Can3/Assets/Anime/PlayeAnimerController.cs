@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerAnimeController : MonoBehaviour
@@ -57,4 +55,14 @@ public class PlayerAnimeController : MonoBehaviour
 
         lastX = currentX;
     }
+
+
+    void LateUpdate()
+    {
+        if (spriteTransform != null && Camera.main != null)
+        {
+            spriteTransform.forward = Camera.main.transform.forward;
+        }
+    }
+
 }

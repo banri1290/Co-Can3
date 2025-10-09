@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 public class RoundCamera : GameSystem
 {
     enum RotateMode { Scrollbar, Buttons }
+
+    public class ChangeRotateEvent : UnityEvent<float> { }
 
     [Header("UI参照")]
     [Tooltip("カメラの回転を制御するUIスクロールバー")]
@@ -21,13 +24,13 @@ public class RoundCamera : GameSystem
     [Tooltip("自動回転の速度")]
     [SerializeField] private float rotateSpeed = 20.0f;
 
-    private EventWithFloat changeRotateEvent = new();
+    private ChangeRotateEvent changeRotateEvent = new();
     private Camera cam;
 
     private bool isTurning = true;
     private bool isTurningRight = false;
 
-    public EventWithFloat ChangeRotate => changeRotateEvent;
+    public ChangeRotateEvent ChangeRotate => changeRotateEvent;
     public float Radius => radius;
     public float Height => height;
     public float AimOffset => aimOffset;
