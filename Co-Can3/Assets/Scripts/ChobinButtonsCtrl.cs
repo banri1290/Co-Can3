@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,7 +14,51 @@ public class ChobinButtonsCtrl : GameSystem
         KeepAspectWithCurrentHeight, // 現在の高さを維持してアスペクト比を維持
     }
 
-    public class ShowCommandEvent : UnityEvent<int> { }
+    [System.Serializable]
+    private class ButtonType
+    {
+        [Tooltip("選択ボタンの画像")]
+        [SerializeField] private Sprite sprite;
+
+        [Tooltip("チョビンからのボタンの相対位置")]
+        [SerializeField] private Vector3 buttonOffset;
+        [Tooltip("選択ボタンの基本サイズ")]
+        [SerializeField] private Vector2 size;
+        [Tooltip("ボタンサイズをスプライトのアスペクト比に合わせて調整する方法")]
+        [SerializeField] private SpriteSizeOption sizeOption = SpriteSizeOption.NonKeepAspect;
+
+        public Vector3 ButtonOffset => buttonOffset;
+
+        public void SetSprite(RectTransform rectTransform)
+        {
+            if (rectTransform == null) return;
+
+            rectTransform.sizeDelta = size;
+            Image image = rectTransform.GetComponent<Image>();
+            if (image != null)
+            {
+                image.sprite = sprite;
+            }
+        }
+
+        public void AdjustSizeToSprite()
+        {
+            if (sprite == null) return;
+            float aspectRatio = sprite.rect.width / sprite.rect.height;
+            switch (sizeOption)
+            {
+                case SpriteSizeOption.NonKeepAspect:
+                    // そのまま
+                    break;
+                case SpriteSizeOption.KeepAspectWithCurrentWidth:
+                    size.y = size.x / aspectRatio;
+                    break;
+                case SpriteSizeOption.KeepAspectWithCurrentHeight:
+                    size.x = size.y * aspectRatio;
+                    break;
+            }
+        }
+    }
 
     [Header("参照設定")]
     [Tooltip("チョビンのパラメータ設定")]
@@ -24,25 +67,19 @@ public class ChobinButtonsCtrl : GameSystem
     [SerializeField] private GameObject chobinButtonCanvas;
     [Tooltip("チョビン選択ボタンのプレハブ")]
     [SerializeField] private GameObject chobinButtonPrefab;
-
-    [Header("ボタンの見た目設定")]
-    [Tooltip("チョビン選択ボタンの画像")]
-    [SerializeField] private Sprite chobinButtonSprite;
     [Tooltip("生成されるチョビン選択ボタンのプレハブ名")]
     [SerializeField] private string chobinButtonPrefabName = "ChobinButton";
-    [Tooltip("チョビンからのボタンの相対位置")]
-    [SerializeField] private Vector3 chobinButtonOffset;
-    [Tooltip("チョビン選択ボタンの基本サイズ")]
-    [SerializeField] private Vector2 chobinButtonSize;
-    [Tooltip("ボタンサイズをスプライトのアスペクト比に合わせて調整する方法")]
-    [SerializeField] private SpriteSizeOption chobinButtonSizeOption = SpriteSizeOption.NonKeepAspect;
+
+    [Header("ボタンの見た目設定")]
+    [Tooltip("待機中のボタンの見た目")]
+    [SerializeField] private ButtonType waitingButtonType;
 
     [Header("エディタ設定")]
     [Tooltip("エディタ再生中以外でもボタンを表示するかどうか")]
     [SerializeField] private bool buttonIsActiveInEditor = true;
 
-    private ShowCommandEvent showCommandEvent = new();
-    public ShowCommandEvent ShowCommand => showCommandEvent;
+    private EventWithInt showCommandEvent = new();
+    public EventWithInt ShowCommand => showCommandEvent;
     public ChobinSetting ChobinSetting => chobinSetting;
     // Start is called before the first frame update
     void Start()
@@ -149,7 +186,8 @@ public class ChobinButtonsCtrl : GameSystem
 
     private void InitChobins()
     {
-        chobinButtonSize = SpriteSize(chobinButtonSprite, chobinButtonSize, chobinButtonSizeOption);
+        ButtonType buttonType = waitingButtonType;
+        waitingButtonType.AdjustSizeToSprite();
 
         for (int i = 0; i < GetChobinCount(); i++)
         {
@@ -157,12 +195,8 @@ public class ChobinButtonsCtrl : GameSystem
             GameObject chobinButtonObject = chobinButtonCanvas.transform.GetChild(i).gameObject;
             Button chobinButton = chobinButtonObject.GetComponent<Button>();
             RectTransform chobinButtonRect = chobinButtonObject.GetComponent<RectTransform>();
-            chobinButtonRect.sizeDelta = chobinButtonSize;
-            Image chobinImage = chobinButtonObject.GetComponent<Image>();
-            if (chobinImage != null)
-            {
-                chobinImage.sprite = chobinButtonSprite;
-            }
+            buttonType.SetSprite(chobinButtonRect);
+            // チョビンの位置に合わせてボタンの位置を設定
             if (chobinButton != null)
             {
                 int chobinIndex = i; // ローカル変数を使用してクロージャーの問題を回避
@@ -171,7 +205,7 @@ public class ChobinButtonsCtrl : GameSystem
             }
             if (chobinSetting != null && chobinSetting.Chobins != null && i < chobinSetting.Chobins.Length)
             {
-                chobinSetting.Chobins[i].SetSelectButton(chobinButtonObject, chobinButtonOffset);
+                chobinSetting.Chobins[i].SetSelectButton(chobinButtonObject, waitingButtonType.ButtonOffset);
             }
 
 #if UNITY_EDITOR
@@ -188,32 +222,6 @@ public class ChobinButtonsCtrl : GameSystem
 #endif
         }
         chobinSetting.Init();
-    }
-
-    private Vector2 SpriteSize(Sprite sprite, Vector2 targetSize, SpriteSizeOption spriteSizeOption)
-    {
-        Vector2 newSize = targetSize;
-        switch (spriteSizeOption)
-        {
-            case SpriteSizeOption.NonKeepAspect:
-                // そのまま
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentWidth:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.height / sprite.rect.width;
-                    newSize.y = newSize.x * aspectRatio;
-                }
-                break;
-            case SpriteSizeOption.KeepAspectWithCurrentHeight:
-                if (sprite != null)
-                {
-                    float aspectRatio = sprite.rect.width / sprite.rect.height;
-                    newSize.x = newSize.y * aspectRatio;
-                }
-                break;
-        }
-        return newSize;
     }
 
     private int GetChobinCount()
