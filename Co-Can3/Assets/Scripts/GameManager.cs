@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
     [Header("Score Calclating")]
     [Tooltip("料理のスコア計算を担当するコンポーネント。")]
     [SerializeField] private CookingScoreCalclater cookingScoreCalclater;
+   
+
 
     private ChobinSetting chobinSetting;
 
@@ -293,6 +295,7 @@ public class GameManager : MonoBehaviour
     /// <param name="chobinIndex">
     /// 料理を提供したチョビンのインデックス
     /// </param>
+
     private void SendServeData(int chobinIndex)
     {
         guestCtrl.ServeDish();
@@ -310,8 +313,24 @@ public class GameManager : MonoBehaviour
         }
         // 客の待ち時間を取得
         float waitingTime = guest.WaitingTimer;
+ // 🍳 Dish データを作成
+    Dish dish = new Dish();
+    foreach (var id in materialIndices)
+    {
+        dish.AddIngredient($"材料{id}");
+    }
 
-        Debug.Log($"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。材料ID: [{string.Join(", ", materialIndices)}]、調理法ID: [{string.Join(", ", actionIndices)}]、待ち時間: {waitingTime:F2}秒");
+    dish.Steps = actionIndices.Length;
+    dish.CookTime = waitingTime;
+
+    // 🧮 スコア計算
+    int score = cookingScoreCalclater.CalculateScore(dish);
+
+        Debug.Log($"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。" +
+          $"材料ID: [{string.Join(", ", materialIndices)}]、" +
+          $"調理法ID: [{string.Join(", ", actionIndices)}]、" +
+          $"待ち時間: {waitingTime:F2}秒、" +
+          $"スコア: {score}");
 
         // CookingScoreCalclaterに料理・客の情報を渡してスコア計算を実行させる
         //cookingScoreCalclater.CalculateScore(materialIndices, actionIndices, waitingTime);
