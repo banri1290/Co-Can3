@@ -332,6 +332,8 @@ public class GameManager : MonoBehaviour
           $"待ち時間: {waitingTime:F2}秒、" +
           $"スコア: {score}");
 
+// 🎉 リアクションを表示
+guest.ShowReaction(score);
         // CookingScoreCalclaterに料理・客の情報を渡してスコア計算を実行させる
         //cookingScoreCalclater.CalculateScore(materialIndices, actionIndices, waitingTime);
     }

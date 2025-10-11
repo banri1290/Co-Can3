@@ -116,4 +116,39 @@ public class GuestBehaviour : MonoBehaviour
                 break;
         }
     }
+        // ▼▼ ここから追記 ▼▼
+    [SerializeField] private TMPro.TextMeshProUGUI reactionText; // 頭上に表示するテキスト
+
+    public void ShowReaction(int score)
+    {
+        if (reactionText == null)
+        {
+            Debug.LogWarning($"ゲスト {id} にリアクションTextが設定されていません。");
+            return;
+        }
+
+        string emoji = GetEmoji(score);
+        reactionText.text = emoji;
+        reactionText.gameObject.SetActive(true);
+
+        // 2秒後に非表示
+        CancelInvoke(nameof(HideReaction));
+        Invoke(nameof(HideReaction), 2f);
+    }
+
+    private void HideReaction()
+    {
+        if (reactionText != null)
+            reactionText.gameObject.SetActive(false);
+    }
+
+    private string GetEmoji(int score)
+    {
+        if (score <= 5) return "😡";
+        if (score <= 10) return "🤨";
+        if (score <= 20) return "😑";
+        if (score <= 25) return "😄";
+        return "😆";
+    }
+    // ▲▲ ここまで追記 ▲▲
 }
