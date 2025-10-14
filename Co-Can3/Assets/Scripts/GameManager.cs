@@ -289,31 +289,42 @@ public class GameManager : MonoBehaviour
         InitCommandTexts(chobinIndex);
     }
 
-    /// <summary>
-    /// 料理を提供したときに呼び出されるメソッド
-    /// </summary>
-    /// <param name="chobinIndex">
-    /// 料理を提供したチョビンのインデックス
-    /// </param>
+  /// <summary>
+/// 料理を提供したときに呼び出されるメソッド
+/// </summary>
+/// <param name="chobinIndex">
+/// 料理を提供したチョビンのインデックス
+/// </param>
+private void SendServeData(int chobinIndex)
+{
+    // 🍽️ サーブ処理
+    guestCtrl.ServeDish();
 
-    private void SendServeData(int chobinIndex)
+    // 🧍‍♂️ 料理を受け取った客を取得
+    GuestBehaviour guest = guestCtrl.GetServedGuest();
+    if (guest == null)
     {
-        guestCtrl.ServeDish();
-        // 料理を受け取った客
-        GuestBehaviour guest = guestCtrl.GetServedGuest();
-        // 料理を提供したチョビン
-        ChobinBehaviour chobin = GetChobin(chobinIndex);
-        // 提供した料理の材料・調理法のIDを取得
-        int[] materialIndices = new int[cookingCommandBehaviour.CommandCount];
-        int[] actionIndices = new int[cookingCommandBehaviour.CommandCount];
-        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
-        {
-            materialIndices[i] = chobin.MaterialIndex[i];
-            actionIndices[i] = chobin.ActionIndex[i];
-        }
-        // 客の待ち時間を取得
-        float waitingTime = guest.WaitingTimer;
- // 🍳 Dish データを作成
+        Debug.LogWarning("料理を受け取る客が見つかりません。");
+        return;
+    }
+
+    // 👨‍🍳 提供したチョビンを取得
+    ChobinBehaviour chobin = GetChobin(chobinIndex);
+
+    // 🧂 提供した料理の材料・調理法のIDを取得
+    int[] materialIndices = new int[cookingCommandBehaviour.CommandCount];
+    int[] actionIndices = new int[cookingCommandBehaviour.CommandCount];
+
+    for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
+    {
+        materialIndices[i] = chobin.MaterialIndex[i];
+        actionIndices[i] = chobin.ActionIndex[i];
+    }
+
+    // ⏱️ 客の待ち時間を取得
+    float waitingTime = guest.WaitingTimer;
+
+    // 🍳 Dish データを作成
     Dish dish = new Dish();
     foreach (var id in materialIndices)
     {
@@ -324,55 +335,70 @@ public class GameManager : MonoBehaviour
     dish.CookTime = waitingTime;
 
     // 🧮 スコア計算
-    int score = cookingScoreCalclater.CalculateScore(dish);
+    int score = cookingScoreCalclater.CalculateScore(dish, guest);
 
-        Debug.Log($"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。" +
-          $"材料ID: [{string.Join(", ", materialIndices)}]、" +
-          $"調理法ID: [{string.Join(", ", actionIndices)}]、" +
-          $"待ち時間: {waitingTime:F2}秒、" +
-          $"スコア: {score}");
+    // 🎉 リアクションを表示
+    guest.ShowReaction(score);
 
-// 🎉 リアクションを表示
-guest.ShowReaction(score);
-        // CookingScoreCalclaterに料理・客の情報を渡してスコア計算を実行させる
-        //cookingScoreCalclater.CalculateScore(materialIndices, actionIndices, waitingTime);
-    }
+    // 🧾 デバッグ出力
+    Debug.Log(
+        $"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。" +
+        $"材料ID: [{string.Join(", ", materialIndices)}]、" +
+        $"調理法ID: [{string.Join(", ", actionIndices)}]、" +
+        $"待ち時間: {waitingTime:F2}秒、" +
+        $"スコア: {score}"
+    );
 
-    private void SubmitCommand(int chobinIndex)
+    // ✅ 提供が終わったのでこの客の待機を終了し、タイマーをリセット
+    guest.StopWaiting();
+
+    // ✅ 客の状態を「GotDish（退店中）」に更新
+    guest.SetState(GuestBehaviour.Status.GotDish);
+}
+
+
+// -------------------------------------------
+
+private void SubmitCommand(int chobinIndex)
+{
+    void serveDish() => SendServeData(chobinIndex);
+
+    Transform[] target = new Transform[cookingCommandBehaviour.CommandCount];
+    for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
     {
-        void serveDish() => SendServeData(chobinIndex);
-        Transform[] target = new Transform[cookingCommandBehaviour.CommandCount];
-        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
-        {
-            target[i] = actions[GetChobin(chobinIndex).ActionIndex[i]].KitchinSpot;
-        }
-        GetChobin(chobinIndex).SetCommand(serveDish, target);
-        guestCtrl.ReceiveOrder();
+        target[i] = actions[GetChobin(chobinIndex).ActionIndex[i]].KitchinSpot;
     }
 
-    private void InformGuestWaitingForOrder(bool b)
+    GetChobin(chobinIndex).SetCommand(serveDish, target);
+
+    // ✅ 注文受付を開始
+    guestCtrl.ReceiveOrder();
+}
+
+private void InformGuestWaitingForOrder(bool b)
+{
+    for (int i = 0; i < chobinSetting.Chobins.Length; i++)
     {
-        for (int i = 0; i < chobinSetting.Chobins.Length; i++)
-        {
-            GetChobin(i).SetHasGuestFlag(b);
-        }
+        GetChobin(i).SetHasGuestFlag(b);
     }
+}
 
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-        CheckSettingOnValidate();
-    }
+private void OnValidate()
+{
+    CheckSettingOnValidate();
+}
 #endif
-    private void CheckSettingOnValidate()
-    {
+
+private void CheckSettingOnValidate()
+{
 #if UNITY_EDITOR
-        if (EditorApplication.isPlayingOrWillChangePlaymode)
-        {
-            Debug.Log("Playモードに移行前のため、設定のチェックと初期化をスキップします。");
-            return;
-        }
-        CheckSettings();
-#endif
+    if (EditorApplication.isPlayingOrWillChangePlaymode)
+    {
+        Debug.Log("Playモードに移行前のため、設定のチェックと初期化をスキップします。");
+        return;
     }
+    CheckSettings();
+#endif
+}
 }

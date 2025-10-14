@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GuestBehaviour : MonoBehaviour
 {
@@ -29,6 +30,10 @@ public class GuestBehaviour : MonoBehaviour
     public int ID => id;
     public Status CurrentStatus => status;
 
+    public List<string> LikedIngredients = new List<string>();    // 好きな食材
+public List<string> HatedIngredients = new List<string>();    // 嫌いな食材
+public List<string> EmotionIngredients = new List<string>();  // 感情対応食材
+
     public GuestEvent GuestEventInstance => guestEvent;
     public float WaitingTimer => waitTimer;
 
@@ -48,8 +53,10 @@ public class GuestBehaviour : MonoBehaviour
     public void Init(int guestId)
     {
         id = guestId;
+         StopWaiting();    
         isWaiting = false;
         waitTimer = 0f;
+           hasMovedFlag = false; 
         SetState(Status.Entering);
     }
 
@@ -94,8 +101,14 @@ public class GuestBehaviour : MonoBehaviour
     {
         isWaiting = true;
         waitTimer = 0f;
+              Debug.Log($"[GuestBehaviour] Guest {id} started waiting.");
     }
-
+public void StopWaiting()
+{
+    isWaiting = false;
+    waitTimer = 0f; // ✅ 念のためリセット
+       Debug.Log($"[GuestBehaviour] Guest {id} stopped waiting (reset timer).");
+}
     public void SetState(Status _status)
     {
         status = _status;
@@ -144,10 +157,10 @@ public class GuestBehaviour : MonoBehaviour
 
     private string GetEmoji(int score)
     {
-        if (score <= 5) return "😡";
-        if (score <= 10) return "🤨";
-        if (score <= 20) return "😑";
-        if (score <= 25) return "😄";
+        if (score <= 5) return "😅";
+        if (score <= 10) return "😀";
+        if (score <= 20) return "😄";
+        if (score <= 25) return "😁";
         return "😆";
     }
     // ▲▲ ここまで追記 ▲▲
