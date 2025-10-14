@@ -20,30 +20,51 @@ public class CookingScoreCalclater : GameSystem
     }
 
     // 🍳 Dish情報をもとにスコアを計算
-    public int CalculateScore(Dish dish)
+ public int CalculateScore(Dish dish, GuestBehaviour guest)
+{
+    int score = 0;
+
+    // 1️⃣ 部族の好み・嫌い
+    foreach (var ingredient in dish.Ingredients)
     {
-        int score = 0;
-
-        // 🧂 味の基本点
-        score += tasteScore;
-
-        // 🥬 材料数による基本点
-        score += dish.Ingredients.Count * 5;
-
-        // 🔥 調理工程数による加点
-        score += dish.Steps * stepWeight;
-
-        // ⏱ 調理時間（短いほど良い）
-        if (dish.CookTime < waitingTimeThreshold)
-            score += 10;
-        else
+        if (guest.LikedIngredients.Contains(ingredient))
+            score += 5;
+        else if (guest.HatedIngredients.Contains(ingredient))
             score -= 5;
-
-        // スコアの下限を0に
-        score = Mathf.Max(0, score);
-
-        Debug.Log($"【スコア計算】材料:{dish.Ingredients.Count}個 工程:{dish.Steps} 調理時間:{dish.CookTime:F2}秒 → スコア:{score}");
-
-        return score;
     }
+
+    // 2️⃣ 提供時間
+    if (dish.CookTime < 45f)
+        score += 10;
+    else if (dish.CookTime > 60f)
+        score -= 3;
+
+    // 3️⃣ 感情対応の食材
+    bool hasEmotionIngredient = false;
+    foreach (var ingredient in dish.Ingredients)
+    {
+        if (guest.EmotionIngredients.Contains(ingredient))
+        {
+            hasEmotionIngredient = true;
+            break;
+        }
+    }
+    score += hasEmotionIngredient ? 5 : -5;
+
+    // 4️⃣ 調理工程
+    switch (dish.Steps)
+    {
+        case 3: score += 10; break;
+        case 2: score += 5; break;
+        case 1: score += 0; break;
+        case 0: score -= 10; break;
+    }
+
+    // スコア下限
+    score = Mathf.Max(0, score);
+
+    Debug.Log($"【スコア計算】材料:{dish.Ingredients.Count}個 工程:{dish.Steps} 調理時間:{dish.CookTime:F2}秒 → スコア:{score}");
+
+    return score;
+}
 }

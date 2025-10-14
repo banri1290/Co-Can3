@@ -51,7 +51,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  reactionText: {fileID: 0}
+  LikedIngredients:
+  - "\u6750\u65990"
+  HatedIngredients:
+  - "\u6750\u65991"
+  EmotionIngredients:
+  - "\u6750\u65992"
+  reactionText: {fileID: 7574645924243609843}
 --- !u!54 &938727440963644389
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -390,14 +396,14 @@ RectTransform:
   m_GameObject: {fileID: 5983825542034469149}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.12495821, y: 0.43432, z: 0.43432}
+  m_LocalScale: {x: 0.12067293, y: 0.056309626, z: 0.16175814}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5614172797615950929}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -960.19, y: -526.29}
+  m_AnchoredPosition: {x: -960.06, y: -536.1402}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3370300458866945525
@@ -431,7 +437,7 @@ MonoBehaviour:
   m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fc88aa3a0d47aa94f9f393b14715914f, type: 2}
-  m_sharedMaterial: {fileID: -6124771756258334433, guid: fc88aa3a0d47aa94f9f393b14715914f, type: 2}
+  m_sharedMaterial: {fileID: -2575636165127189732, guid: fc88aa3a0d47aa94f9f393b14715914f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
