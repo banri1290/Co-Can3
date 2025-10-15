@@ -177,8 +177,14 @@ public class GuestCtrl : GameSystem
 
     public GuestBehaviour GetServedGuest()
     {
-        return guestList[guestExitCounter - 1];
+          int index = guestExitCounter - 1;
+    if (index < 0 || index >= guestList.Count)
+    {
+        Debug.LogWarning($"[GuestCtrl] ServedGuestを取得できません。guestExitCounter={guestExitCounter}, guestList.Count={guestList.Count}");
+        return null;
     }
+    return guestList[index];
+}
 
     private void SendGuestMessage(int guestId)
     {

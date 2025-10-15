@@ -304,9 +304,12 @@ private void SendServeData(int chobinIndex)
     GuestBehaviour guest = guestCtrl.GetServedGuest();
     if (guest == null)
     {
-        Debug.LogWarning("料理を受け取る客が見つかりません。");
+        Debug.LogWarning("提供対象の客が見つかりません。");
         return;
     }
+
+    // ✅ 調理時間を取得（GetCookingTimeを利用）
+    float cookingTime = guest.GetCookingTime();
 
     // 👨‍🍳 提供したチョビンを取得
     ChobinBehaviour chobin = GetChobin(chobinIndex);
@@ -321,9 +324,6 @@ private void SendServeData(int chobinIndex)
         actionIndices[i] = chobin.ActionIndex[i];
     }
 
-    // ⏱️ 客の待ち時間を取得
-    float waitingTime = guest.WaitingTimer;
-
     // 🍳 Dish データを作成
     Dish dish = new Dish();
     foreach (var id in materialIndices)
@@ -332,7 +332,7 @@ private void SendServeData(int chobinIndex)
     }
 
     dish.Steps = actionIndices.Length;
-    dish.CookTime = waitingTime;
+    dish.CookTime = cookingTime; // ✅ ← 修正済み
 
     // 🧮 スコア計算
     int score = cookingScoreCalclater.CalculateScore(dish, guest);
@@ -345,17 +345,15 @@ private void SendServeData(int chobinIndex)
         $"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。" +
         $"材料ID: [{string.Join(", ", materialIndices)}]、" +
         $"調理法ID: [{string.Join(", ", actionIndices)}]、" +
-        $"待ち時間: {waitingTime:F2}秒、" +
+        $"調理時間: {cookingTime:F2}秒、" +
         $"スコア: {score}"
     );
 
-    // ✅ 提供が終わったのでこの客の待機を終了し、タイマーをリセット
+    // ✅ 後処理
     guest.StopWaiting();
-
-    // ✅ 客の状態を「GotDish（退店中）」に更新
+    guest.StopCooking(); // ✅ ← 調理終了を明示
     guest.SetState(GuestBehaviour.Status.GotDish);
 }
-
 
 // -------------------------------------------
 
@@ -371,6 +369,13 @@ private void SubmitCommand(int chobinIndex)
 
     GetChobin(chobinIndex).SetCommand(serveDish, target);
 
+   // ✅ 注文受付を開始
+    GuestBehaviour guest = guestCtrl.GetServedGuest();
+    if (guest != null)
+    {
+        guest.StartCooking(); // 🍳 調理タイマー開始
+        Debug.Log($"🍳 Guest {guest.ID} started cooking.");
+    }
     // ✅ 注文受付を開始
     guestCtrl.ReceiveOrder();
 }
