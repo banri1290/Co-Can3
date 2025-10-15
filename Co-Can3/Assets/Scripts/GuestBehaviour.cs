@@ -27,6 +27,10 @@ public class GuestBehaviour : MonoBehaviour
     private bool isWaiting = false;
     private float waitTimer = 0f;
 
+      private bool isCooking = false;
+    private float cookingStartTime = 0f;
+    private float cookingElapsed = 0f;
+
     public int ID => id;
     public Status CurrentStatus => status;
 
@@ -48,6 +52,8 @@ public List<string> EmotionIngredients = new List<string>();  // 感情対応食
     {
         Move();
         if (isWaiting) CountWaitingTime();
+           if (isCooking)
+        UpdateCookingTime(); // ← ここを追加
     }
 
     public void Init(int guestId)
@@ -55,6 +61,7 @@ public List<string> EmotionIngredients = new List<string>();  // 感情対応食
         id = guestId;
          StopWaiting();    
         isWaiting = false;
+         StopCooking(); 
         waitTimer = 0f;
            hasMovedFlag = false; 
         SetState(Status.Entering);
@@ -109,6 +116,37 @@ public void StopWaiting()
     waitTimer = 0f; // ✅ 念のためリセット
        Debug.Log($"[GuestBehaviour] Guest {id} stopped waiting (reset timer).");
 }
+    // 🍳 ====== ここから調理時間管理部分 ======
+    public void StartCooking()
+    {
+        isCooking = true;
+        cookingStartTime = Time.realtimeSinceStartup;
+        cookingElapsed = 0f;
+        Debug.Log($"🍳 Guest {id} started cooking at {cookingStartTime}");
+    }
+
+    private void UpdateCookingTime()
+    {
+        cookingElapsed = Time.realtimeSinceStartup - cookingStartTime;
+    }
+
+    public float GetCookingTime()
+    {
+        if (isCooking)
+        return Time.realtimeSinceStartup - cookingStartTime; // 調理中は現在時刻との差
+    return cookingElapsed; // 停止後は確定値
+    }
+
+    public void StopCooking()
+    {
+        if (isCooking)
+        {
+             isCooking = false;
+        cookingElapsed = Time.realtimeSinceStartup - cookingStartTime; // ✅ 停止時点で確定
+        Debug.Log($"🍽️ Guest {id} finished cooking. Total time: {cookingElapsed:F2}秒");
+        }
+    }
+    // 🍳 ====== ここまで追加 ======
     public void SetState(Status _status)
     {
         status = _status;
@@ -126,6 +164,7 @@ public void StopWaiting()
                 break;
             case Status.GotDish:
                 isWaiting = false;
+                  StopCooking(); // ✅ 料理完了時に止める
                 break;
         }
     }
