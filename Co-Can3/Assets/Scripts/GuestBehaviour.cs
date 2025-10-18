@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class GuestBehaviour : MonoBehaviour
 {
@@ -98,7 +99,7 @@ public List<string> EmotionIngredients = new List<string>();  // 感情対応食
             guestEvent.Invoke(id);
         }
     }
-
+    
     private void CountWaitingTime()
     {
         waitTimer += Time.deltaTime;
@@ -137,6 +138,14 @@ public void StopWaiting()
     return cookingElapsed; // 停止後は確定値
     }
 
+  public UnityEvent OnCookingFinished; // ← 追加
+
+    private void Awake()
+    {
+        if (OnCookingFinished == null)
+            OnCookingFinished = new UnityEvent();
+    }
+
     public void StopCooking()
     {
         if (isCooking)
@@ -144,6 +153,7 @@ public void StopWaiting()
              isCooking = false;
         cookingElapsed = Time.realtimeSinceStartup - cookingStartTime; // ✅ 停止時点で確定
         Debug.Log($"🍽️ Guest {id} finished cooking. Total time: {cookingElapsed:F2}秒");
+           OnCookingFinished?.Invoke(); // 完了イベント
         }
     }
     // 🍳 ====== ここまで追加 ======

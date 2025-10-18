@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,8 +39,15 @@ public class GameManager : MonoBehaviour
     [Header("Score Calclating")]
     [Tooltip("料理のスコア計算を担当するコンポーネント。")]
     [SerializeField] private CookingScoreCalclater cookingScoreCalclater;
-   
 
+       [Header("UI References")]
+    [SerializeField] private TextMeshProUGUI serveCountText;  // 提供数表示
+    [SerializeField] private TextMeshProUGUI totalScoreText;  // スコア表示
+    [SerializeField] private TextMeshProUGUI totalSumText;    // 合計（提供数＋スコア）表示
+   
+private int totalScore = 0;              // 全体スコア
+private int guestProcessedCount = 0;     // 処理済みの客数（退店した客）
+  private int servedCount = 0;     // 提供数
 
     private ChobinSetting chobinSetting;
 
@@ -46,6 +55,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         CheckSettings();
+         // 🎯 開始時は UI を完全に非表示にする
+     serveCountText?.gameObject.SetActive(false);
+        totalScoreText?.gameObject.SetActive(false);
+        totalSumText?.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -141,7 +154,6 @@ public class GameManager : MonoBehaviour
         // イベントリスナーを一度クリアしてから再登録
         cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.NextMaterialEvent.RemoveAllListeners();
-        cookingCommandBehaviour.PreviousMaterialEvent.RemoveAllListeners();
         cookingCommandBehaviour.NextActionEvent.RemoveAllListeners();
 
         cookingCommandBehaviour.PreviousMaterialEvent.AddListener(SetPreviousMaterial);
@@ -353,6 +365,60 @@ private void SendServeData(int chobinIndex)
     guest.StopWaiting();
     guest.StopCooking(); // ✅ ← 調理終了を明示
     guest.SetState(GuestBehaviour.Status.GotDish);
+
+     totalScore += score;
+    guestProcessedCount++;
+    servedCount++; // ✅ 提供数をカウント追加
+
+    Debug.Log($"👥 {guestProcessedCount}人目のスコアを加算。合計スコア: {totalScore}");
+
+    if (guestProcessedCount >= 5)
+    {
+        ShowTotalScore();
+    }
+}
+/// <summary>
+/// 提供数・スコア・合計をUIに反映
+/// </summary>
+private void UpdateScoreUI()
+{
+    int totalSum = servedCount + totalScore;
+
+    if (serveCountText != null)
+        serveCountText.text = $"提供数：{servedCount}";
+
+    if (totalScoreText != null)
+        totalScoreText.text = $"スコア：{totalScore}";
+
+    if (totalSumText != null)
+        totalSumText.text = $"合計：{totalSum}";
+}
+private void ShowTotalScore()
+{
+     int totalSum = servedCount + totalScore;
+
+    string resultText = $"提供数：{servedCount}\n" +
+                        $"スコア：{totalScore}\n" +
+                        $"合計：{totalSum}";
+    // 🎯 テキストをアクティブ化して内容を設定
+    if (serveCountText != null)
+    {
+        serveCountText.gameObject.SetActive(true);
+        serveCountText.text = $"提供数：{servedCount}";
+    }
+
+    if (totalScoreText != null)
+    {
+        totalScoreText.gameObject.SetActive(true);
+        totalScoreText.text = $"スコア：{totalScore}";
+    }
+
+    if (totalSumText != null)
+    {
+        totalSumText.gameObject.SetActive(true);
+        totalSumText.text = $"合計：{totalSum}";
+    }
+    Debug.Log($"🏁 全員処理完了！{resultText}");
 }
 
 // -------------------------------------------
@@ -369,14 +435,21 @@ private void SubmitCommand(int chobinIndex)
 
     GetChobin(chobinIndex).SetCommand(serveDish, target);
 
-   // ✅ 注文受付を開始
+    // 🍳 提供前に Guest を取得して調理開始
     GuestBehaviour guest = guestCtrl.GetServedGuest();
     if (guest != null)
     {
-        guest.StartCooking(); // 🍳 調理タイマー開始
+        guest.OnCookingFinished.RemoveAllListeners();
+        guest.OnCookingFinished.AddListener(() =>
+        {
+            UpdateScoreUI(); // 提供ごとにUI更新
+        });
+
+        guest.StartCooking();
         Debug.Log($"🍳 Guest {guest.ID} started cooking.");
     }
-    // ✅ 注文受付を開始
+
+    // 注文受付開始
     guestCtrl.ReceiveOrder();
 }
 
@@ -388,6 +461,12 @@ private void InformGuestWaitingForOrder(bool b)
     }
 }
 
+  private IEnumerator ServeAfterDelay(GuestBehaviour guest, int chobinIndex, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+          guest.StopCooking();
+        SendServeData(chobinIndex);
+    }
 #if UNITY_EDITOR
 private void OnValidate()
 {
