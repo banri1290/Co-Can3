@@ -6,7 +6,7 @@ public class GuestCtrl : GameSystem
 {
     [Header("参照設定")]
     [Tooltip("生成する客のプレハブ")]
-    [SerializeField] private GuestBehaviour GuestPrafab;
+    [SerializeField] private GuestBehaviour[] guestPrefabs;
     [Tooltip("客の出現場所")]
     [SerializeField] private Transform spawnSpot;
     [Tooltip("客が注文をする場所")]
@@ -76,10 +76,10 @@ public class GuestCtrl : GameSystem
         }
 
         bool AllSettingsAreCorrect = true;
-        if (GuestPrafab == null)
+        if (guestPrefabs == null || guestPrefabs.Length == 0)
         {
             AllSettingsAreCorrect = false;
-            Debug.LogError("GuestPrafabが設定されていません。");
+            Debug.LogError("guestPrefabsが設定されていません。");
         }
         if (spawnSpot == null)
         {
@@ -127,7 +127,8 @@ public class GuestCtrl : GameSystem
 
     private void SpawnGuest()
     {
-        GuestBehaviour newGuest = Instantiate(GuestPrafab, spawnSpot.position, Quaternion.identity);
+        int prefabIndex = Random.Range(0, guestPrefabs.Length);
+        GuestBehaviour newGuest = Instantiate(guestPrefabs[prefabIndex], spawnSpot.position, Quaternion.identity);
         guestList.Add(newGuest);
         newGuest.SetSpeed(speed);
         newGuest.GuestEventInstance.RemoveAllListeners();
