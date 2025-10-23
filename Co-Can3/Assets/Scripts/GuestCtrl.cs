@@ -139,6 +139,10 @@ public class GuestCtrl : GameSystem
 
         guestComeCounter++;
         spawnTimer = Random.Range(SpawnIntervalMin, SpawnIntervalMax);
+         // 🆕 追加：客が登場した瞬間に注文絵文字を表示
+    string[] menuEmojis = { "🍣", "🍔", "🍰", "🍜", "🍕" };
+    string randomEmoji = menuEmojis[Random.Range(0, menuEmojis.Length)];
+    newGuest.ShowOrderEmoji(randomEmoji);
     }
 
     /// <summary>

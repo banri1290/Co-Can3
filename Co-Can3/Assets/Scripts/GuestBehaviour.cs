@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using TMPro;
 
 public class GuestBehaviour : MonoBehaviour
 {
@@ -14,8 +15,7 @@ public class GuestBehaviour : MonoBehaviour
         GotDish = 4, // 料理を受け取り退店中
     }
 
-    public class GuestEvent : UnityEngine.Events.UnityEvent<int> { }
-
+    public class GuestEvent : UnityEvent<int> { }
     [Tooltip("客の移動速度。GuestCtrlから設定されます。")]
     [SerializeField] private float speed;
 
@@ -42,6 +42,11 @@ public List<string> EmotionIngredients = new List<string>();  // 感情対応食
     public GuestEvent GuestEventInstance => guestEvent;
     public float WaitingTimer => waitTimer;
 
+   [Header("🟡 絵文字関連")]
+    [SerializeField] private TextMeshProUGUI reactionText;
+    [SerializeField] private string[] orderEmojis = { "😅", "🍣", "🍜", "🍕", "🥗" };
+
+    public UnityEvent OnCookingFinished;
     // Start is called before the first frame update
     void Start()
     {
@@ -66,12 +71,19 @@ public List<string> EmotionIngredients = new List<string>();  // 感情対応食
         waitTimer = 0f;
            hasMovedFlag = false; 
         SetState(Status.Entering);
+          // 🍽️ 客IDに応じて絵文字を決定
+      if (orderEmojis != null && orderEmojis.Length > 0)
+        {
+            int index = guestId % orderEmojis.Length;
+            selectedOrderEmoji = orderEmojis[index];
+        }
+        else
+        {
+            selectedOrderEmoji = "😅"; // デフォルト
+        }
     }
 
-    public void SetSpeed(float _speed)
-    {
-        speed = _speed;
-    }
+    public void SetSpeed(float _speed) => speed = _speed;
 
     public void SetDirection(Vector3 _direction)
     {
@@ -138,12 +150,13 @@ public void StopWaiting()
     return cookingElapsed; // 停止後は確定値
     }
 
-  public UnityEvent OnCookingFinished; // ← 追加
-
     private void Awake()
     {
         if (OnCookingFinished == null)
             OnCookingFinished = new UnityEvent();
+                // 🟡 最初は頭上の絵文字を非表示
+    if (reactionText != null)
+        reactionText.gameObject.SetActive(false);
     }
 
     public void StopCooking()
@@ -166,6 +179,7 @@ public void StopWaiting()
                 // 入店中の処理
                 break;
             case Status.WaitingOrder:
+            ShowOrderEmoji(); // 🍔 注文絵文字を出す
                 break;
             case Status.Ordering:
                 break;
@@ -179,24 +193,18 @@ public void StopWaiting()
         }
     }
         // ▼▼ ここから追記 ▼▼
-    [SerializeField] private TMPro.TextMeshProUGUI reactionText; // 頭上に表示するテキスト
 
     public void ShowReaction(int score)
-    {
-        if (reactionText == null)
-        {
-            Debug.LogWarning($"ゲスト {id} にリアクションTextが設定されていません。");
-            return;
-        }
-
+     {
+        if (reactionText == null) return;
         string emoji = GetEmoji(score);
         reactionText.text = emoji;
         reactionText.gameObject.SetActive(true);
 
-        // 2秒後に非表示
         CancelInvoke(nameof(HideReaction));
         Invoke(nameof(HideReaction), 2f);
     }
+
 
     private void HideReaction()
     {
@@ -213,4 +221,38 @@ public void StopWaiting()
         return "😆";
     }
     // ▲▲ ここまで追記 ▲▲
+    // 🍽️ ====== 注文絵文字管理 ======
+[SerializeField] private string[] orderEmoji = { "😅", "😀", "😄", "😁" };  // デフォルト注文絵文字
+private string selectedOrderEmoji; // この客が使う絵文字
+/// <summary>
+/// 注文開始時に頭上に絵文字を表示
+/// </summary>
+public void ShowOrderEmoji(string emoji = null)
+{
+    if (reactionText == null)
+    {
+        Debug.LogWarning($"ゲスト {id} にリアクションTextが設定されていません。");
+        return;
+    }
+   CancelInvoke(nameof(HideReaction)); // 🔸 以前の非表示予約をキャンセル
+    reactionText.gameObject.SetActive(true);
+      // emoji 引数があればそれを使い、なければ selectedOrderEmoji を使う
+    reactionText.text = emoji ?? selectedOrderEmoji;
+}
+
+/// <summary>
+/// 料理を渡したあとにリアクション絵文字へ切り替える
+/// </summary>
+public void ShowReactionAndHideOrder(int score)
+{
+    if (reactionText == null) return;
+
+    string emoji = GetEmoji(score);
+    reactionText.text = emoji;
+    reactionText.gameObject.SetActive(true);
+
+    // 2秒後に非表示
+    CancelInvoke(nameof(HideReaction));
+    Invoke(nameof(HideReaction), 2f);
+}
 }

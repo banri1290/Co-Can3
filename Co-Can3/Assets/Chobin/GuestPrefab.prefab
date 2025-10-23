@@ -58,6 +58,20 @@ MonoBehaviour:
   EmotionIngredients:
   - "\u6750\u65992"
   reactionText: {fileID: 7574645924243609843}
+  orderEmojis:
+  - "\U0001F605"
+  - "\U0001F60D"
+  - "\U0001F605"
+  - "\U0001F609"
+  - "\U0001F606"
+  OnCookingFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  orderEmoji:
+  - 
+  - 
+  - 
+  - 
 --- !u!54 &938727440963644389
 Rigidbody:
   m_ObjectHideFlags: 0
