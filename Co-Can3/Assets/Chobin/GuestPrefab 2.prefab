@@ -52,15 +52,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   LikedIngredients:
-  - "\u6750\u65992"
+  - "\u6750\u65993"
+  - "\u6750\u65994"
+  - "\u6750\u65995"
   HatedIngredients:
   - "\u6750\u65990"
-  EmotionIngredients:
   - "\u6750\u65991"
+  - "\u6750\u65992"
+  EmotionIngredients:
+  - "\u6750\u659906"
+  reactionText: {fileID: 7574645924243609843}
+  orderEmojis:
+  - "\U0001F606"
+  - "\U0001F605"
+  - "\U0001F60D"
+  - "\U0001F600"
+  - "\U0001F601"
   OnCookingFinished:
     m_PersistentCalls:
       m_Calls: []
-  reactionText: {fileID: 7574645924243609843}
+  orderEmoji:
+  - "\U0001F605"
+  - "\U0001F600"
+  - "\U0001F604"
+  - "\U0001F601"
 --- !u!54 &938727440963644389
 Rigidbody:
   m_ObjectHideFlags: 0
