@@ -52,9 +52,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0
   LikedIngredients:
-  - "\u6750\u65990"
-  HatedIngredients:
   - "\u6750\u65991"
+  HatedIngredients:
+  - "\u6750\u65990"
   EmotionIngredients:
   - "\u6750\u65992"
   OnCookingFinished:
