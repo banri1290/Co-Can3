@@ -23,7 +23,7 @@ public class PlayerAnimeController : MonoBehaviour
         animator = spriteTransform.GetComponent<Animator>();
         if (animator == null)
         {
-            Debug.LogWarning($"[PlayerAnimeController] Animator 未找到：{spriteTransform.name}");
+            Debug.LogWarning($"[PlayerAnimeController] Animator Cant find：{spriteTransform.name}");
         }
 
         lastX = observedTransform.position.x;
