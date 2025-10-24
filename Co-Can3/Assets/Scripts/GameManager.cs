@@ -1,7 +1,14 @@
 using UnityEngine;
+<<<<<<< Updated upstream
 using UnityEngine.Events;
 using TMPro;
 using System.Collections;
+=======
+using System.Collections.Generic;
+using TMPro;
+
+
+>>>>>>> Stashed changes
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,6 +33,17 @@ public class GameManager : MonoBehaviour
     [Tooltip("UIから調理コマンドを受け付け、表示を管理するビヘイビア。")]
     [SerializeField] private CookingCommandBehaviour cookingCommandBehaviour;
 
+<<<<<<< Updated upstream
+=======
+    [Header("Chobin Setting")]
+    [Tooltip("プレイヤーキャラクター（Chobin）の基本設定を管理するコンポーネント。")]
+    [SerializeField] private ChobinSetting chobinSetting;
+
+    [Header("Chobin Manager")]
+    [Tooltip("料理人キャラクター（Chobin）の状態と行動を管理するコンポーネント。")]
+    [SerializeField] private ChobinManager chobinManager;
+
+>>>>>>> Stashed changes
     [Header("Chobin Buttons Control")]
     [Tooltip("プレイヤー（Chobin）の選択とコマンド入力を管理するUIコンポーネント。")]
     [SerializeField] private ChobinButtonsCtrl chobinButtonsCtrl;
@@ -40,6 +58,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("料理のスコア計算を担当するコンポーネント。")]
     [SerializeField] private CookingScoreCalclater cookingScoreCalclater;
 
+<<<<<<< Updated upstream
        [Header("UI References")]
     [SerializeField] private TextMeshProUGUI serveCountText;  // 提供数表示
     [SerializeField] private TextMeshProUGUI totalScoreText;  // スコア表示
@@ -50,15 +69,36 @@ private int guestProcessedCount = 0;     // 処理済みの客数（退店した
   private int servedCount = 0;     // 提供数
 
     private ChobinSetting chobinSetting;
+=======
+    [SerializeField] private TextMeshProUGUI serveCountText;
+    [SerializeField] private TextMeshProUGUI totalScoreText;
+    [SerializeField] private TextMeshProUGUI totalSumText;
+
+    int totalScore = 0;
+    int guestProcessedCount = 0;
+    int servedCount = 0;
+
+    private ChobinBehaviour GetChobin(int i) => chobinSetting.Chobins[i];
+
+    private int CompareChoninAndGuest()
+    {
+        int cookingNum = chobinManager.CurrentCookingNum;
+        int waitingNum = guestCtrl.WaitingGuestNum;
+        return cookingNum - waitingNum;
+    }
+>>>>>>> Stashed changes
 
     // Start is called before the first frame update
     void Start()
     {
         CheckSettings();
+<<<<<<< Updated upstream
          // 🎯 開始時は UI を完全に非表示にする
      serveCountText?.gameObject.SetActive(false);
         totalScoreText?.gameObject.SetActive(false);
         totalSumText?.gameObject.SetActive(false);
+=======
+>>>>>>> Stashed changes
     }
 
     // Update is called once per frame
@@ -96,7 +136,13 @@ private int guestProcessedCount = 0;     // 処理済みの客数（退店した
 
         // 各コンポーネントの検証をヘルパーメソッドで行う
         validationResults.Add(ValidateComponent(cookingCommandBehaviour, "指示UIを管理するオブジェクト"));
+<<<<<<< Updated upstream
         validationResults.Add(ValidateComponent(chobinButtonsCtrl, "チョビンオブジェクト"));
+=======
+        validationResults.Add(ValidateComponent(chobinSetting, "ChobinSettingのオブジェクト"));
+        validationResults.Add(ValidateComponent(chobinManager, "ChobinManagerのオブジェクト"));
+        validationResults.Add(ValidateComponent(chobinButtonsCtrl, "チョビンのボタンUIを管理するオブジェクト"));
+>>>>>>> Stashed changes
         validationResults.Add(ValidateComponent(guestCtrl, "客を出現させて管理するオブジェクト"));
         validationResults.Add(ValidateComponent(roundCamera, "CameraCtrlのオブジェクト"));
         validationResults.Add(ValidateComponent(cookingScoreCalclater, "CookingScoreCalclaterのオブジェクト"));
@@ -168,18 +214,45 @@ private int guestProcessedCount = 0;     // 処理済みの客数（退店した
     {
         // CookingCommandBehaviourから正しい指示数を取得してChobinSettingに設定
         chobinSetting.SetCommandCount(cookingCommandBehaviour.CommandCount);
+<<<<<<< Updated upstream
 
+=======
+        chobinSetting.Init();
+
+        for (int i = 0; i < chobinSetting.Chobins.Length; i++)
+        {
+            // 各チョビンに料理提供と帰還のイベントを設定
+            int index = i; // ローカルコピーを作成してクロージャ問題を回避
+            GetChobin(index).SetEvents(
+                () => SendServeData(index),
+                JudgeNeedToCook
+            );
+        }
+
+>>>>>>> Stashed changes
         chobinButtonsCtrl.ShowCommand.RemoveAllListeners();
         chobinButtonsCtrl.ShowCommand.AddListener(ShowCommand);
+<<<<<<< Updated upstream
+=======
+        chobinButtonsCtrl.QuitCommand.AddListener(ForceQuitCommand);
+        chobinButtonsCtrl.SetChobins(chobinSetting.Chobins);
+>>>>>>> Stashed changes
         chobinButtonsCtrl.Init();
     }
 
     private void InitGuestCtrl()
     {
+<<<<<<< Updated upstream
         guestCtrl.HasGuestWaitingForOrder.RemoveAllListeners();
         guestCtrl.LeftGuestWaitingForOrder.RemoveAllListeners();
         guestCtrl.HasGuestWaitingForOrder.AddListener(() => InformGuestWaitingForOrder(true));
         guestCtrl.LeftGuestWaitingForOrder.AddListener(() => InformGuestWaitingForOrder(false));
+=======
+        guestCtrl.HasComeGuest.RemoveAllListeners();
+        guestCtrl.HasComeGuest.AddListener(JudgeNeedToCook);
+        guestCtrl.AllGuestExit.RemoveAllListeners();
+        guestCtrl.AllGuestExit.AddListener(ShowTotalScore);
+>>>>>>> Stashed changes
         guestCtrl.Init();
     }
 
@@ -194,7 +267,11 @@ private int guestProcessedCount = 0;     // 処理済みの客数（退店した
         }
 
         roundCamera.ChangeRotate.RemoveAllListeners();
+<<<<<<< Updated upstream
         roundCamera.ChangeRotate.AddListener((v) => setButtonDirection(v));
+=======
+        roundCamera.ChangeRotate.AddListener((val) => setButtonDirection(val));
+>>>>>>> Stashed changes
         roundCamera.Init();
     }
 
@@ -316,8 +393,69 @@ private void SendServeData(int chobinIndex)
     GuestBehaviour guest = guestCtrl.GetServedGuest();
     if (guest == null)
     {
+<<<<<<< Updated upstream
         Debug.LogWarning("提供対象の客が見つかりません。");
         return;
+=======
+        guestCtrl.ServeDish();
+        chobinManager.DecrementCookingNum();
+        chobinButtonsCtrl.HideButton(chobinIndex);
+        // 料理を受け取った客
+        GuestBehaviour guest = guestCtrl.GetServedGuest();
+
+        // ✅ 調理時間を取得（GetCookingTimeを利用）
+        float cookingTime = guest.GetCookingTime();
+
+        // 👨‍🍳 提供したチョビンを取得
+        ChobinBehaviour chobin = GetChobin(chobinIndex);
+
+        // 🧂 提供した料理の材料・調理法のIDを取得
+        int[] materialIndices = new int[cookingCommandBehaviour.CommandCount];
+        int[] actionIndices = new int[cookingCommandBehaviour.CommandCount];
+
+        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
+        {
+            materialIndices[i] = chobin.MaterialIndex[i];
+            actionIndices[i] = chobin.ActionIndex[i];
+        }
+
+        // 🍳 Dish データを作成
+        Dish dish = new Dish();
+        foreach (var id in materialIndices)
+        {
+            dish.AddIngredient($"材料{id}");
+        }
+
+        dish.Steps = actionIndices.Length;
+        dish.CookTime = cookingTime; // ✅ ← 修正済み
+
+        // 🧮 スコア計算
+        int score = cookingScoreCalclater.CalculateScore(dish, guest);
+
+        // 🎉 リアクションを表示
+        guest.ShowReaction(score);
+
+        // 🧾 デバッグ出力
+        Debug.Log(
+            $"チョビン{chobinIndex}が客{guest.ID}に料理を提供しました。" +
+            $"材料ID: [{string.Join(", ", materialIndices)}]、" +
+            $"調理法ID: [{string.Join(", ", actionIndices)}]、" +
+            $"調理時間: {cookingTime:F2}秒、" +
+            $"スコア: {score}"
+        );
+
+        // ✅ 後処理
+        guest.StopWaiting();
+        guest.StopCooking(); // ✅ ← 調理終了を明示
+        guest.SetState(GuestBehaviour.Status.GotDish);
+
+        totalScore += score;
+        guestProcessedCount++;
+        servedCount++; // ✅ 提供数をカウント追加
+
+        Debug.Log($"👥 {guestProcessedCount}人目のスコアを加算。合計スコア: {totalScore}");
+
+>>>>>>> Stashed changes
     }
 
     // ✅ 調理時間を取得（GetCookingTimeを利用）
@@ -332,6 +470,7 @@ private void SendServeData(int chobinIndex)
 
     for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
     {
+<<<<<<< Updated upstream
         materialIndices[i] = chobin.MaterialIndex[i];
         actionIndices[i] = chobin.ActionIndex[i];
     }
@@ -486,3 +625,124 @@ private void CheckSettingOnValidate()
 #endif
 }
 }
+=======
+        Transform[] target = new Transform[cookingCommandBehaviour.CommandCount];
+        for (int i = 0; i < cookingCommandBehaviour.CommandCount; i++)
+        {
+            target[i] = actions[GetChobin(chobinIndex).ActionIndex[i]].KitchinSpot;
+        }
+
+        GetChobin(chobinIndex).SetCommand(target);
+
+        // 🍳 提供前に Guest を取得して調理開始
+        GuestBehaviour guest = guestCtrl.GetOrderGuest();
+        if (guest != null)
+        {
+            guest.OnCookingFinished.RemoveAllListeners();
+            guest.OnCookingFinished.AddListener(() =>
+            {
+                UpdateScoreUI(); // 提供ごとにUI更新
+            });
+
+            guest.StartCooking();
+            Debug.Log($"🍳 Guest {guest.ID} started cooking.");
+        }
+
+        chobinManager.IncrementCookingNum();
+        if (CompareChoninAndGuest() > 0)
+        {
+            guestCtrl.ReceiveOrder();
+        }
+        chobinButtonsCtrl.SetPerformingButton(chobinIndex);
+        JudgeNeedToCook();
+    }
+    /// <summary>
+    /// 提供数・スコア・合計をUIに反映
+    /// </summary>
+    private void UpdateScoreUI()
+    {
+        int totalSum = servedCount + totalScore;
+
+        if (serveCountText != null)
+            serveCountText.text = $"提供数：{servedCount}";
+
+        if (totalScoreText != null)
+            totalScoreText.text = $"スコア：{totalScore}";
+
+        if (totalSumText != null)
+            totalSumText.text = $"合計：{totalSum}";
+    }
+    private void ShowTotalScore()
+    {
+        int totalSum = servedCount + totalScore;
+
+        string resultText = $"提供数：{servedCount}\n" +
+                            $"スコア：{totalScore}\n" +
+                            $"合計：{totalSum}";
+        // 🎯 テキストをアクティブ化して内容を設定
+        if (serveCountText != null)
+        {
+            serveCountText.gameObject.SetActive(true);
+            serveCountText.text = $"提供数：{servedCount}";
+        }
+
+        if (totalScoreText != null)
+        {
+            totalScoreText.gameObject.SetActive(true);
+            totalScoreText.text = $"スコア：{totalScore}";
+        }
+
+        if (totalSumText != null)
+        {
+            totalSumText.gameObject.SetActive(true);
+            totalSumText.text = $"合計：{totalSum}";
+        }
+        Debug.Log($"🏁 全員処理完了！{resultText}");
+    }
+
+
+    private void ForceQuitCommand(int chobinIndex)
+    {
+        GetChobin(chobinIndex).ForceQuitCommand();
+        chobinManager.DecrementCookingNum();
+        JudgeNeedToCook();
+        chobinButtonsCtrl.HideButton(chobinIndex);
+        guestCtrl.InformCookingQuit();
+    }
+
+    private void JudgeNeedToCook()
+    {
+        bool needToCook = CompareChoninAndGuest() < 0 || guestCtrl.HasGuestWaitingOrder;
+        for (int i = 0; i < chobinSetting.Chobins.Length; i++)
+        {
+            if (GetChobin(i).IsCooking) continue;
+            if (needToCook)
+            {
+                chobinButtonsCtrl.SetWaitingButton(i);
+            }
+            else
+            {
+                chobinButtonsCtrl.HideButton(i);
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        CheckSettingOnValidate();
+    }
+#endif
+    private void CheckSettingOnValidate()
+    {
+#if UNITY_EDITOR
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.Log("Playモードに移行前のため、設定のチェックと初期化をスキップします。");
+            return;
+        }
+        CheckSettings();
+#endif
+    }
+}
+>>>>>>> Stashed changes

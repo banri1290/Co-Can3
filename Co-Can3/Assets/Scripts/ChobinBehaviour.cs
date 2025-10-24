@@ -37,6 +37,10 @@ public class ChobinBehaviour : MonoBehaviour
     [SerializeField] private Slider performingTimeSlider;
 
     private UnityEvent serveEvent = new();
+<<<<<<< Updated upstream
+=======
+    private UnityEvent comeBackEvent = new();
+>>>>>>> Stashed changes
 
     private Transform[] target;
     private int[] materialIndex;
@@ -53,6 +57,11 @@ public class ChobinBehaviour : MonoBehaviour
     public int[] MaterialIndex => materialIndex;
     public int[] ActionIndex => actionIndex;
     public int ID => id;
+<<<<<<< Updated upstream
+=======
+
+    public bool IsCooking => status != Status.CommandWaitiating;
+>>>>>>> Stashed changes
 
     // Start is called before the first frame update
     void Start()
@@ -69,7 +78,10 @@ public class ChobinBehaviour : MonoBehaviour
         switch (status)
         {
             case Status.CommandWaitiating:
+<<<<<<< Updated upstream
                 CommandWaiting();
+=======
+>>>>>>> Stashed changes
                 break;
             case Status.Moving:
                 MovingBehave();
@@ -138,9 +150,18 @@ public class ChobinBehaviour : MonoBehaviour
         performingTimeLength = _performingTimeLength;
     }
 
+<<<<<<< Updated upstream
     void CommandWaiting()
     {
         selectButton.transform.position = transform.position + selectButtonOffset;
+=======
+    public void SetEvents(UnityAction serveAction, UnityAction comeBackAction)
+    {
+        serveEvent.RemoveAllListeners();
+        serveEvent.AddListener(serveAction);
+        comeBackEvent.RemoveAllListeners();
+        comeBackEvent.AddListener(comeBackAction);
+>>>>>>> Stashed changes
     }
 
     void MovingBehave()
@@ -173,6 +194,10 @@ public class ChobinBehaviour : MonoBehaviour
     {
         if ((transform.position - servingSpot.position).magnitude < 0.1)
         {
+<<<<<<< Updated upstream
+=======
+            serveEvent.Invoke();
+>>>>>>> Stashed changes
             SetState(Status.BackToWaitingSpot);
         }
     }
@@ -210,7 +235,11 @@ public class ChobinBehaviour : MonoBehaviour
         SetState(Status.Moving);
     }
 
+<<<<<<< Updated upstream
     public void SetButtonDirection(float angle)
+=======
+    public void ForceQuitCommand()
+>>>>>>> Stashed changes
     {
         buttonRect.rotation = Quaternion.Euler(0, angle, 0);
     }
@@ -223,14 +252,20 @@ public class ChobinBehaviour : MonoBehaviour
             case Status.CommandWaitiating:
 #if UNITY_EDITOR
                 if (EditorApplication.isPlaying)
+<<<<<<< Updated upstream
                 {
                     selectButton.SetActive(hasGuestWaitingForOrderFlag);
+=======
+>>>>>>> Stashed changes
                     navAgent.SetDestination(transform.position);
                 }
 
 #else
                 navAgent.SetDestination(transform.position);
+<<<<<<< Updated upstream
                 selectButton.SetActive(hasGuestWaitingForOrderFlag);
+=======
+>>>>>>> Stashed changes
 #endif
                 break;
             case Status.Moving:

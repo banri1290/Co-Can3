@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Co-Can3/Assets/Scenes/TitleScene.meta
 guid: b9eb3944ee92b8c41907f6aa77612755
+========
+guid: 43bf349f4dc3cab478558a837ef31e6b
+>>>>>>>> Stashed changes:Co-Can3/Assets/CGAssets.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

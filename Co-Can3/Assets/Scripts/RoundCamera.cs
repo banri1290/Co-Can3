@@ -12,6 +12,7 @@ public class RoundCamera : GameSystem
     [Header("UI参照")]
     [Tooltip("カメラの回転を制御するUIスクロールバー")]
     [SerializeField] private Scrollbar scrollbar;
+    [SerializeField] private bool scrollbarActive;
     [Header("カメラ設定")]
     [Tooltip("カメラの回転中心からの距離")]
     [SerializeField] private float radius = 5.0f;
@@ -45,7 +46,16 @@ public class RoundCamera : GameSystem
     // Update is called once per frame
     void Update()
     {
+        MouseWheelDrag();
+    }
 
+    private void MouseWheelDrag()
+    {
+        if (isTurning)
+        {
+            float mouseWheelSensitivity = Input.mouseScrollDelta.y * rotateSpeed;
+            Turn(mouseWheelSensitivity);
+        }
     }
 
     public override bool CheckSettings()
@@ -74,7 +84,7 @@ public class RoundCamera : GameSystem
 
     public void Init()
     {
-        isTurning = false;
+        isTurning = !scrollbarActive;
         isTurningRight = false;
 
         SetCamera();
@@ -93,10 +103,10 @@ public class RoundCamera : GameSystem
     {
         if (scrollbar != null)
         {
-            scrollbar.gameObject.SetActive(true);
+            scrollbar.gameObject.SetActive(scrollbarActive);
         }
         scrollbar.onValueChanged.AddListener(RotateCamera);
-        scrollbar.SetValueWithoutNotify(0.5f);
+        SetScrollbarWithCurrentAngle();
     }
 
     private void AddTurnEvent2Scrollbar()
@@ -132,9 +142,18 @@ public class RoundCamera : GameSystem
         changeRotateEvent.Invoke(angle);
     }
 
-    private void Turn()
+    private void SetScrollbarWithCurrentAngle()
     {
-        float angle = rotateSpeed * Time.deltaTime;
+        float angle = transform.eulerAngles.y;
+        float value = angle / 360.0f + 0.5f;
+        while (value > 1.0f) value -= 1.0f;
+        while(value <= 0.0f) value += 1.0f;
+        //scrollbar.SetValueWithoutNotify(value);
+    }
+
+    private void Turn(float speed)
+    {
+        float angle = speed * Time.deltaTime;
         if (isTurningRight) angle *= -1;
         transform.Rotate(0, angle, 0);
 
@@ -142,6 +161,7 @@ public class RoundCamera : GameSystem
         while (value > 1.0f) value -= 1.0f;
         while (value < 0.0f) value += 1.0f;
         scrollbar.SetValueWithoutNotify(value);
+        changeRotateEvent.Invoke(transform.eulerAngles.y);
     }
 
     public void SetRadius(float newRadius)

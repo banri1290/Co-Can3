@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Co-Can3/Assets/Title/GameFlowManager.cs.meta
 guid: 12302853fe1ca4549b5e37271c827863
+========
+guid: a622f19c2176a774896645063b3c7e4d
+>>>>>>>> Stashed changes:Co-Can3/Assets/Scripts/ChobinButton.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

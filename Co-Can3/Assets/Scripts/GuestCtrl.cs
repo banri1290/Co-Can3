@@ -40,10 +40,15 @@ public class GuestCtrl : GameSystem
 
     private bool isActive = false;
     private float spawnTimer = 0f;
+<<<<<<< Updated upstream
+=======
+    private bool hasGuestWaitingOrder = false;
+>>>>>>> Stashed changes
 
     private int guestComeCounter;
     private int guestOrderCounter;
     private int guestExitCounter;
+<<<<<<< Updated upstream
     private int currentGuestNum;
 
     private UnityEvent hasGuestWaitingForOrderEvent = new();
@@ -52,6 +57,18 @@ public class GuestCtrl : GameSystem
     public UnityEvent HasGuestWaitingForOrder => hasGuestWaitingForOrderEvent;
     public UnityEvent LeftGuestWaitingForOrder => leftGuestWaitingForOrderEvent;
     public int CurrentGuestNum => currentGuestNum;
+=======
+    private int guestHasCookedCounter;
+
+    private UnityEvent hasComeGuestEvent = new();
+    private UnityEvent allGuestExitEvent = new();
+
+    public UnityEvent HasComeGuest => hasComeGuestEvent;
+    public UnityEvent AllGuestExit => allGuestExitEvent;
+
+    public int WaitingGuestNum => guestOrderCounter - guestExitCounter;
+    public bool HasGuestWaitingOrder => hasGuestWaitingOrder;
+>>>>>>> Stashed changes
 
     // Update is called once per frame
     void Update()
@@ -76,10 +93,28 @@ public class GuestCtrl : GameSystem
         }
 
         bool AllSettingsAreCorrect = true;
+<<<<<<< Updated upstream
         if (guestPrefabs == null || guestPrefabs.Length == 0)
         {
             AllSettingsAreCorrect = false;
             Debug.LogError("guestPrefabsが設定されていません。");
+=======
+        if (guestPrefabs.Length == 0)
+        {
+            AllSettingsAreCorrect = false;
+            Debug.LogError("guestPrefabsが設定されていません。");
+        }
+        else
+        {
+            for (int i = 0; i < guestPrefabs.Length; i++)
+            {
+                if (guestPrefabs[i] == null)
+                {
+                    AllSettingsAreCorrect = false;
+                    Debug.LogError("guestPrefabs[" + i + "]が設定されていません。");
+                }
+            }
+>>>>>>> Stashed changes
         }
         if (spawnSpot == null)
         {
@@ -111,7 +146,12 @@ public class GuestCtrl : GameSystem
         guestComeCounter = 0;
         guestOrderCounter = 0;
         guestExitCounter = 0;
+<<<<<<< Updated upstream
         currentGuestNum = 0;
+=======
+        guestHasCookedCounter = 0;
+        hasGuestWaitingOrder = false;
+>>>>>>> Stashed changes
 
         Debug.Log("GuestCtrlの初期化が完了しました。");
     }
@@ -147,7 +187,10 @@ public class GuestCtrl : GameSystem
     /// </summary>
     public void ReceiveOrder()
     {
+<<<<<<< Updated upstream
         leftGuestWaitingForOrderEvent.Invoke();
+=======
+>>>>>>> Stashed changes
         guestList[guestOrderCounter].SetState(GuestBehaviour.Status.WaitingDish);
         for (int i = guestExitCounter; i < guestOrderCounter + 1; i++)
         {
@@ -161,6 +204,10 @@ public class GuestCtrl : GameSystem
         }
 
         guestOrderCounter++;
+<<<<<<< Updated upstream
+=======
+        guestHasCookedCounter++;
+>>>>>>> Stashed changes
     }
 
     public void ServeDish()
@@ -178,11 +225,41 @@ public class GuestCtrl : GameSystem
 
     public GuestBehaviour GetServedGuest()
     {
+<<<<<<< Updated upstream
           int index = guestExitCounter - 1;
     if (index < 0 || index >= guestList.Count)
     {
         Debug.LogWarning($"[GuestCtrl] ServedGuestを取得できません。guestExitCounter={guestExitCounter}, guestList.Count={guestList.Count}");
         return null;
+=======
+        return guestList[guestExitCounter - 1];
+    }
+
+    public GuestBehaviour GetOrderGuest()
+    {
+        return guestList[guestOrderCounter];
+    }
+
+    public void InformCookingQuit()
+    {
+        guestHasCookedCounter--;
+    }
+
+
+    private void GuestOnCounter(int guestId)
+    {
+        GuestBehaviour guest = guestList[guestId];
+        if (guestId == guestOrderCounter)
+        {
+            hasGuestWaitingOrder = true;
+            hasComeGuestEvent.Invoke();
+            guest.SetState(GuestBehaviour.Status.Ordering);
+        }
+        else if (guest.CurrentStatus == GuestBehaviour.Status.Entering)
+        {
+            guest.SetState(GuestBehaviour.Status.WaitingOrder);
+        }
+>>>>>>> Stashed changes
     }
     return guestList[index];
 }
@@ -197,6 +274,7 @@ public class GuestCtrl : GameSystem
             case GuestBehaviour.Status.None:
                 break;
             case GuestBehaviour.Status.Entering:
+<<<<<<< Updated upstream
                 if (guestId == guestOrderCounter)
                 {
                     hasGuestWaitingForOrderEvent.Invoke();
@@ -215,6 +293,13 @@ public class GuestCtrl : GameSystem
                     hasGuestWaitingForOrderEvent.Invoke();
                     guest.SetState(GuestBehaviour.Status.Ordering);
                 }
+=======
+                GuestOnCounter(guestId);
+                guest.StartWaiting();
+                break;
+            case GuestBehaviour.Status.WaitingOrder:
+                GuestOnCounter(guestId);
+>>>>>>> Stashed changes
                 break;
             case GuestBehaviour.Status.Ordering:
                 break;
@@ -225,6 +310,8 @@ public class GuestCtrl : GameSystem
                 {
                     Destroy(guest.gameObject);
                     guest = null;
+                    if (guestExitCounter == totalGuestNum)
+                        allGuestExitEvent.Invoke();
                 }
                 break;
             default:
