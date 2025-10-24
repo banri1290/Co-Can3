@@ -175,6 +175,8 @@ public void StopWaiting()
             case Status.GotDish:
                 isWaiting = false;
                   StopCooking(); // ✅ 料理完了時に止める
+                    // 🎯 料理提供完了をGameFlowManagerに通知
+    FindObjectOfType<GameFlowManager>()?.OnDishServed();
                 break;
         }
     }
